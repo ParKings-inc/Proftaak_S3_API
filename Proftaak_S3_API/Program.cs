@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ProftaakContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var app = builder.Build();
 
