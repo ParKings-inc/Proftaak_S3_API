@@ -11,55 +11,55 @@ namespace Proftaak_S3_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GeragesController : ControllerBase
+    public class GaragesController : ControllerBase
     {
         private readonly ProftaakContext _context;
 
-        public GeragesController(ProftaakContext context)
+        public GaragesController(ProftaakContext context)
         {
             _context = context;
         }
 
-        // GET: api/Gerages
+        // GET: api/Garages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gerage>>> GetGerage()
+        public async Task<ActionResult<IEnumerable<Garage>>> GetGarage()
         {
-          if (_context.Gerage == null)
+          if (_context.Garage == null)
           {
               return NotFound();
           }
-            return await _context.Gerage.ToListAsync();
+            return await _context.Garage.ToListAsync();
         }
 
-        // GET: api/Gerages/5
+        // GET: api/Garages/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gerage>> GetGerage(int id)
+        public async Task<ActionResult<Garage>> GetGarage(int id)
         {
-          if (_context.Gerage == null)
+          if (_context.Garage == null)
           {
               return NotFound();
           }
-            var gerage = await _context.Gerage.FindAsync(id);
+            var garage = await _context.Garage.FindAsync(id);
 
-            if (gerage == null)
+            if (garage == null)
             {
                 return NotFound();
             }
 
-            return gerage;
+            return garage;
         }
 
-        // PUT: api/Gerages/5
+        // PUT: api/Garages/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGerage(int id, Gerage gerage)
+        public async Task<IActionResult> PutGarage(int id, Garage garage)
         {
-            if (id != gerage.Id)
+            if (id != garage.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(gerage).State = EntityState.Modified;
+            _context.Entry(garage).State = EntityState.Modified;
 
             try
             {
@@ -67,7 +67,7 @@ namespace Proftaak_S3_API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GerageExists(id))
+                if (!GarageExists(id))
                 {
                     return NotFound();
                 }
@@ -80,44 +80,44 @@ namespace Proftaak_S3_API.Controllers
             return NoContent();
         }
 
-        // POST: api/Gerages
+        // POST: api/Garages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Gerage>> PostGerage(Gerage gerage)
+        public async Task<ActionResult<Garage>> PostGarage(Garage garage)
         {
-          if (_context.Gerage == null)
+          if (_context.Garage == null)
           {
-              return Problem("Entity set 'ProftaakContext.Gerage'  is null.");
+              return Problem("Entity set 'ProftaakContext.Garage'  is null.");
           }
-            _context.Gerage.Add(gerage);
+            _context.Garage.Add(garage);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGerage", new { id = gerage.Id }, gerage);
+            return CreatedAtAction("GetGarage", new { id = garage.Id }, garage);
         }
 
-        // DELETE: api/Gerages/5
+        // DELETE: api/Garages/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteGerage(int id)
+        public async Task<IActionResult> DeleteGarage(int id)
         {
-            if (_context.Gerage == null)
+            if (_context.Garage == null)
             {
                 return NotFound();
             }
-            var gerage = await _context.Gerage.FindAsync(id);
-            if (gerage == null)
+            var garage = await _context.Garage.FindAsync(id);
+            if (garage == null)
             {
                 return NotFound();
             }
 
-            _context.Gerage.Remove(gerage);
+            _context.Garage.Remove(garage);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool GerageExists(int id)
+        private bool GarageExists(int id)
         {
-            return (_context.Gerage?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Garage?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

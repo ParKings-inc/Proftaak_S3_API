@@ -3,7 +3,7 @@
     public class Parking
     {
         public int Id { get; set; }
-        public Gerage Gerage { get; set; }
+        public Garage Garage { get; set; }
         public Auto Car { get; set; }
         public DateTime ArrivalTime { get; set; }
         public DateTime? DepartureTime { get; set; }
