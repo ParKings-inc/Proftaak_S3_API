@@ -14,20 +14,24 @@ namespace Proftaak_S3_API.Controllers
         }
 
         [HttpPost()]
-        public string SetCookie([FromBody] UserJWT user)
+        public IActionResult SetCookie([FromBody] UserJWT user)
         {
             CookieOptions option = new CookieOptions();
             option.HttpOnly = true;
+            option.MaxAge = TimeSpan.FromHours(1);
+            option.SameSite = SameSiteMode.None;
             option.Secure = true;
-
-            Response.Cookies.Append("jwt", user.encryptedJWT, option);
-            return "Login success";
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", user.encryptedJWT, option);
+            
+            return Ok();
         }
 
         [HttpGet()]
-        public string GetCookie()
+        public IActionResult GetCookie()
         {
-            return Request.Cookies["jwt"];
+            string jwt = _httpContextAccessor.HttpContext.Request.Cookies["jwt"];
+
+            return Ok(jwt);
         }
     }
 }
