@@ -11,5 +11,7 @@ namespace Proftaak_S3_API.Models
         public DbSet<User>? User { get; set; }
 
         public DbSet<Auto>? Auto { get; set; }
+        public DbSet<Gerage>? Gerage { get; set; }
+        public DbSet<Parking>? Parking { get; set; }
     }
 }

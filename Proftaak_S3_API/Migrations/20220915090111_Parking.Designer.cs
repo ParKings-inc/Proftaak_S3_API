@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20220915090111_Parking")]
+    partial class Parking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
