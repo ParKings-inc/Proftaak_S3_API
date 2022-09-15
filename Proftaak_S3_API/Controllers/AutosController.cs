@@ -20,7 +20,7 @@ namespace Proftaak_S3_API.Controllers
             _context = context;
         }
 
-        // GET: api/Autos
+        // GET: api/Autoes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Auto>>> GetAuto()
         {
@@ -31,7 +31,7 @@ namespace Proftaak_S3_API.Controllers
             return await _context.Auto.ToListAsync();
         }
 
-        // GET: api/Autos/5
+        // GET: api/Autoes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Auto>> GetAuto(int id)
         {
@@ -49,7 +49,7 @@ namespace Proftaak_S3_API.Controllers
             return auto;
         }
 
-        // PUT: api/Autos/5
+        // PUT: api/Autoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAuto(int id, Auto auto)
@@ -80,7 +80,7 @@ namespace Proftaak_S3_API.Controllers
             return NoContent();
         }
 
-        // POST: api/Autos
+        // POST: api/Autoes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Auto>> PostAuto(Auto auto)
@@ -95,7 +95,7 @@ namespace Proftaak_S3_API.Controllers
             return CreatedAtAction("GetAuto", new { id = auto.Id }, auto);
         }
 
-        // DELETE: api/Autos/5
+        // DELETE: api/Autoes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuto(int id)
         {
