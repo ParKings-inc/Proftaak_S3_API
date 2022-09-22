@@ -7,5 +7,7 @@
         public double Price { get; set; }
         public DateTime? OpeningTime { get; set; }
         public DateTime? ClosingTime { get; set; }
+        public int FreeSpace { get; set; }
+        public int MaxSpace { get; set; }
     }
 }
