@@ -119,5 +119,21 @@ namespace Proftaak_S3_API.Controllers
         {
             return (_context.Parking?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        // GET: api/Parkings
+        [HttpGet("/car/{car}")]
+        public async Task<ActionResult<IEnumerable<Parking>>> GetParkingPerCar(Auto car)
+        {
+            if (_context.Parking == null)
+            {
+                return NotFound();
+            }
+            if (car == null)
+            {
+                return NotFound();
+            }
+            return await _context.Parking.Where(p => p.Car == car).ToListAsync();
+        }
+
     }
 }
