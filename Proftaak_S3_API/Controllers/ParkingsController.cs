@@ -121,7 +121,7 @@ namespace Proftaak_S3_API.Controllers
         }
 
         // GET: api/Parkings
-        [HttpGet("/car/{car}")]
+        [HttpGet("car/{car}")]
         public async Task<ActionResult<IEnumerable<Parking>>> GetParkingPerCar(Auto car)
         {
             if (_context.Parking == null)
