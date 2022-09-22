@@ -119,22 +119,5 @@ namespace Proftaak_S3_API.Controllers
         {
             return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-
-        // GET: api/Users
-        [HttpGet("Exists/{email}")]
-        public async Task<ActionResult<User>> UserExists(string email)
-        {
-            if (_context.User == null)
-            {
-                return NotFound();
-            }
-
-            if (_context.User?.Any(e => e.Email == email) == false)
-            {
-                return NotFound();
-            }
-
-            return await _context.User.Where(e => e.Email == email).FirstAsync();
-        }
     }
 }
