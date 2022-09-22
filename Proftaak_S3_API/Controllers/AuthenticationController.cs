@@ -18,20 +18,32 @@ namespace Proftaak_S3_API.Controllers
         {
             CookieOptions option = new CookieOptions();
             option.HttpOnly = true;
+            if (user.encryptedJWT == "")
+            {
+                option.Expires = DateTime.Now.AddDays(-1);
+            }
             option.MaxAge = TimeSpan.FromHours(1);
+
             option.SameSite = SameSiteMode.None;
             option.Secure = true;
             _httpContextAccessor.HttpContext.Response.Cookies.Append("jwt", user.encryptedJWT, option);
-            
+
             return Ok();
         }
+
 
         [HttpGet()]
         public IActionResult GetCookie()
         {
             string jwt = _httpContextAccessor.HttpContext.Request.Cookies["jwt"];
-
-            return Ok(jwt);
+            if (jwt == "" || jwt == null)
+            {
+                return Ok("not logged in");
+            } else
+            {
+                return Ok(jwt);
+            }
+   
         }
     }
 }
