@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20220915090622_edit_To_Auto")]
+    partial class edit_To_Auto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +46,7 @@ namespace Proftaak_S3_API.Migrations
                     b.ToTable("Auto");
                 });
 
-            modelBuilder.Entity("Proftaak_S3_API.Models.Garage", b =>
+            modelBuilder.Entity("Proftaak_S3_API.Models.Gerage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,12 +56,6 @@ namespace Proftaak_S3_API.Migrations
 
                     b.Property<DateTime?>("ClosingTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("FreeSpace")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxSpace")
-                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -73,7 +69,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Garage");
+                    b.ToTable("Gerage");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Parking", b =>
@@ -93,7 +89,7 @@ namespace Proftaak_S3_API.Migrations
                     b.Property<DateTime?>("DepartureTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GarageId")
+                    b.Property<int>("GerageId")
                         .HasColumnType("int");
 
                     b.Property<double?>("Price")
@@ -103,7 +99,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.HasIndex("GarageId");
+                    b.HasIndex("GerageId");
 
                     b.ToTable("Parking");
                 });
@@ -116,7 +112,11 @@ namespace Proftaak_S3_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("SubId")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -144,15 +144,15 @@ namespace Proftaak_S3_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Proftaak_S3_API.Models.Garage", "Garage")
+                    b.HasOne("Proftaak_S3_API.Models.Gerage", "Gerage")
                         .WithMany()
-                        .HasForeignKey("GarageId")
+                        .HasForeignKey("GerageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Car");
 
-                    b.Navigation("Garage");
+                    b.Navigation("Gerage");
                 });
 #pragma warning restore 612, 618
         }
