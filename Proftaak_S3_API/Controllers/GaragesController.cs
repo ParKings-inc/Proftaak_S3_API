@@ -11,55 +11,55 @@ namespace Proftaak_S3_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AutosController : ControllerBase
+    public class GaragesController : ControllerBase
     {
         private readonly ProftaakContext _context;
 
-        public AutosController(ProftaakContext context)
+        public GaragesController(ProftaakContext context)
         {
             _context = context;
         }
 
-        // GET: api/Autoes
+        // GET: api/Garages
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Auto>>> GetAuto()
+        public async Task<ActionResult<IEnumerable<Garage>>> GetGarage()
         {
-          if (_context.Auto == null)
+          if (_context.Garage == null)
           {
               return NotFound();
           }
-            return await _context.Auto.ToListAsync();
+            return await _context.Garage.ToListAsync();
         }
 
-        // GET: api/Autoes/5
+        // GET: api/Garages/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Auto>> GetAuto(int id)
+        public async Task<ActionResult<Garage>> GetGarage(int id)
         {
-          if (_context.Auto == null)
+          if (_context.Garage == null)
           {
               return NotFound();
           }
-            var auto = await _context.Auto.FindAsync(id);
+            var garage = await _context.Garage.FindAsync(id);
 
-            if (auto == null)
+            if (garage == null)
             {
                 return NotFound();
             }
 
-            return auto;
+            return garage;
         }
 
-        // PUT: api/Autoes/5
+        // PUT: api/Garages/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAuto(int id, Auto auto)
+        public async Task<IActionResult> PutGarage(int id, Garage garage)
         {
-            if (id != auto.Id)
+            if (id != garage.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(auto).State = EntityState.Modified;
+            _context.Entry(garage).State = EntityState.Modified;
 
             try
             {
@@ -67,7 +67,7 @@ namespace Proftaak_S3_API.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AutoExists(id))
+                if (!GarageExists(id))
                 {
                     return NotFound();
                 }
@@ -80,44 +80,44 @@ namespace Proftaak_S3_API.Controllers
             return NoContent();
         }
 
-        // POST: api/Autoes
+        // POST: api/Garages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Auto>> PostAuto(Auto auto)
+        public async Task<ActionResult<Garage>> PostGarage(Garage garage)
         {
-          if (_context.Auto == null)
+          if (_context.Garage == null)
           {
-              return Problem("Entity set 'ProftaakContext.Auto'  is null.");
+              return Problem("Entity set 'ProftaakContext.Garage'  is null.");
           }
-            _context.Auto.Add(auto);
+            _context.Garage.Add(garage);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAuto", new { id = auto.Id }, auto);
+            return CreatedAtAction("GetGarage", new { id = garage.Id }, garage);
         }
 
-        // DELETE: api/Autoes/5
+        // DELETE: api/Garages/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAuto(int id)
+        public async Task<IActionResult> DeleteGarage(int id)
         {
-            if (_context.Auto == null)
+            if (_context.Garage == null)
             {
                 return NotFound();
             }
-            var auto = await _context.Auto.FindAsync(id);
-            if (auto == null)
+            var garage = await _context.Garage.FindAsync(id);
+            if (garage == null)
             {
                 return NotFound();
             }
 
-            _context.Auto.Remove(auto);
+            _context.Garage.Remove(garage);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool AutoExists(int id)
+        private bool GarageExists(int id)
         {
-            return (_context.Auto?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Garage?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

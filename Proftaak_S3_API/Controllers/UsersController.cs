@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -83,12 +84,24 @@ namespace Proftaak_S3_API.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser([FromBody] UserJWT userJWT)
         {
-          if (_context.User == null)
-          {
-              return Problem("Entity set 'ProftaakContext.User'  is null.");
-          }
+            var jwt = userJWT.encryptedJWT;
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(jwt);
+
+            User user = new User();
+            user.SubId = token.Subject;
+
+            if (_context.User == null)
+            {
+                return Problem("Entity set 'ProftaakContext.User'  is null.");
+            }
+            if ((_context.User?.Any(e => e.SubId == user.SubId)).GetValueOrDefault())
+            {
+                return Ok();
+            }
+
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
