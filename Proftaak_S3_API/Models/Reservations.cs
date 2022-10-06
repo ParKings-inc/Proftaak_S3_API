@@ -1,12 +1,11 @@
 ﻿namespace Proftaak_S3_API.Models
 {
-    public class Parking
+    public class Reservations
     {
         public int Id { get; set; }
-        public Garage Garage { get; set; }
-        public Auto Car { get; set; }
+        public int? SpaceID { get; set; }
+        public int CarID { get; set; }
         public DateTime ArrivalTime { get; set; }
         public DateTime? DepartureTime { get; set; }
-        public double? Price { get; set; }
     }
 }

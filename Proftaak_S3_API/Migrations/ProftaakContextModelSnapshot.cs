@@ -17,12 +17,12 @@ namespace Proftaak_S3_API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("ProductVersion", "6.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Proftaak_S3_API.Models.Auto", b =>
+            modelBuilder.Entity("Proftaak_S3_API.Models.Car", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,14 +34,12 @@ namespace Proftaak_S3_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Auto");
+                    b.ToTable("Car");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Garage", b =>
@@ -55,8 +53,9 @@ namespace Proftaak_S3_API.Migrations
                     b.Property<DateTime?>("ClosingTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("FreeSpace")
-                        .HasColumnType("int");
+                    b.Property<decimal>("MaxPrice")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("decimal(9,2)");
 
                     b.Property<int>("MaxSpace")
                         .HasColumnType("int");
@@ -65,18 +64,65 @@ namespace Proftaak_S3_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("NormalPrice")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("decimal(9,2)");
+
                     b.Property<DateTime?>("OpeningTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.ToTable("Garage");
                 });
 
-            modelBuilder.Entity("Proftaak_S3_API.Models.Parking", b =>
+            modelBuilder.Entity("Proftaak_S3_API.Models.Pricing", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<DateTime>("EndingTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GarageID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("decimal(9,2)");
+
+                    b.Property<DateTime>("StartingTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Pricing");
+                });
+
+            modelBuilder.Entity("Proftaak_S3_API.Models.Receipt", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(9, 2)
+                        .HasColumnType("decimal(9,2)");
+
+                    b.Property<int>("ReservationID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Receipt");
+                });
+
+            modelBuilder.Entity("Proftaak_S3_API.Models.Reservations", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,25 +133,40 @@ namespace Proftaak_S3_API.Migrations
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CarId")
+                    b.Property<int>("CarID")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("DepartureTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GarageId")
+                    b.Property<int?>("SpaceID")
                         .HasColumnType("int");
-
-                    b.Property<double?>("Price")
-                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CarId");
+                    b.ToTable("Reservations");
+                });
 
-                    b.HasIndex("GarageId");
+            modelBuilder.Entity("Proftaak_S3_API.Models.Space", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.ToTable("Parking");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<int>("Floor")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GarageID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Spot")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Space");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.User", b =>
@@ -116,6 +177,10 @@ namespace Proftaak_S3_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SubId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -123,36 +188,6 @@ namespace Proftaak_S3_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
-                });
-
-            modelBuilder.Entity("Proftaak_S3_API.Models.Auto", b =>
-                {
-                    b.HasOne("Proftaak_S3_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Proftaak_S3_API.Models.Parking", b =>
-                {
-                    b.HasOne("Proftaak_S3_API.Models.Auto", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Proftaak_S3_API.Models.Garage", "Garage")
-                        .WithMany()
-                        .HasForeignKey("GarageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-
-                    b.Navigation("Garage");
                 });
 #pragma warning restore 612, 618
         }
