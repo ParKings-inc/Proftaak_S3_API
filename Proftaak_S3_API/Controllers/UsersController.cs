@@ -92,6 +92,7 @@ namespace Proftaak_S3_API.Controllers
 
             User user = new User();
             user.SubId = token.Subject;
+            user.Role = "User";
 
             if (_context.User == null)
             {
