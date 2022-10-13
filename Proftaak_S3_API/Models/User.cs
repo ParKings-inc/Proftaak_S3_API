@@ -2,8 +2,7 @@
 {
     public class User
     {
-        public int Id { get; set; }
-        public string SubId { get; set; }
+        public string Id { get; set; }
         public string Role { get; set; }
     }
 }
