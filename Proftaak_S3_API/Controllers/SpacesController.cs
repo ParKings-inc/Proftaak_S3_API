@@ -25,10 +25,19 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("FreeSpaces/{id}")]
         public async Task<string> GetFreeSpaces(int id)
         {
-            var usedSpaces = await _context.Space.Where(s => s.GarageID == id).ToListAsync();
+            // var usedSpaces = await _context.Reservations.Where(s =>  s.SpaceID == id).ToListAsync();
+            var Reservations = await _context.Reservations.ToListAsync();
+            var Spaces = await _context.Space.ToListAsync();
+            int count = 0;
+            var spaces = from s in _context.Reservations
+                         join sa in _context.Space on s.SpaceID equals sa.ID
+                         where sa.GarageID == id
+                         select s;
+
+
             var totalSpaces = await _context.Garage.FindAsync(id);
             List<int> ints = new List<int>();
-            ints.Add(usedSpaces.Count);
+            ints.Add(spaces.ToList().Count);
             ints.Add(totalSpaces.MaxSpace);
             return JsonConvert.SerializeObject(ints);
         }
