@@ -5,6 +5,7 @@
         public int ID { get; set; }
         public int GarageID { get; set; }
         public int Floor { get; set; }
+        public string? Row { get; set; }
         public int Spot { get; set; }
     }
 }
