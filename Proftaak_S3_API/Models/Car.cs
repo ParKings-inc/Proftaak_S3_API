@@ -3,7 +3,7 @@
     public class Car
     {
         public int Id { get; set; }
-        public int UserID { get; set; }
+        public string UserID { get; set; }
         public string Kenteken { get; set; }
     }
 }

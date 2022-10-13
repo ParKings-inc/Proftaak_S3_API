@@ -15,7 +15,7 @@ namespace Proftaak_S3_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
+                    UserID = table.Column<int>(type: "nvarchar(30)", nullable: false),
                     Kenteken = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
