@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -18,6 +19,18 @@ namespace Proftaak_S3_API.Controllers
         public SpacesController(ProftaakContext context)
         {
             _context = context;
+        }
+
+
+        [HttpGet("FreeSpaces/{id}")]
+        public async Task<string> GetFreeSpaces(int id)
+        {
+            var usedSpaces = await _context.Space.Where(s => s.GarageID == id).ToListAsync();
+            var totalSpaces = await _context.Garage.FindAsync(id);
+            List<int> ints = new List<int>();
+            ints.Add(usedSpaces.Count);
+            ints.Add(totalSpaces.MaxSpace);
+            return JsonConvert.SerializeObject(ints);
         }
 
         // GET: api/Spaces
