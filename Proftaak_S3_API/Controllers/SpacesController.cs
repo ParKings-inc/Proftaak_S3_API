@@ -33,12 +33,13 @@ namespace Proftaak_S3_API.Controllers
                          join sa in _context.Space on s.SpaceID equals sa.ID
                          where sa.GarageID == id
                          select s;
-
+            var allSpaces = await _context.Space.ToListAsync();
 
             var totalSpaces = await _context.Garage.FindAsync(id);
+
             List<int> ints = new List<int>();
             ints.Add(spaces.ToList().Count);
-            ints.Add(totalSpaces.MaxSpace);
+            ints.Add(allSpaces.Count);
             return JsonConvert.SerializeObject(ints);
         }
 
