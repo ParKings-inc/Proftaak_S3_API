@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -18,6 +19,30 @@ namespace Proftaak_S3_API.Controllers
         public SpacesController(ProftaakContext context)
         {
             _context = context;
+        }
+
+
+        [HttpGet("FreeSpaces/{id}")]
+        public async Task<string> GetFreeSpaces(int id)
+        {
+            Garage garage = _context.Garage.Where(g => g.Id == id).FirstOrDefault();
+            // var usedSpaces = await _context.Reservations.Where(s =>  s.SpaceID == id).ToListAsync();
+
+            var Spaces = await _context.Space.ToListAsync();
+            int count = 0;
+            var time = garage.ClosingTime.ToString();
+            var spaces = (from s in _context.Reservations
+                          join sa in _context.Space on s.SpaceID equals sa.ID
+                          where sa.GarageID == id && s.ArrivalTime.Date == garage.ClosingTime.GetValueOrDefault().Date && s.ArrivalTime.TimeOfDay <  garage.ClosingTime.GetValueOrDefault().TimeOfDay
+                          select new { s.SpaceID }).Distinct();
+            var allSpaces = await _context.Space.Where(s => s.GarageID == id).ToListAsync();
+
+            var totalSpaces = await _context.Garage.FindAsync(id);
+
+            List<int> ints = new List<int>();
+            ints.Add(spaces.ToList().Count);
+            ints.Add(allSpaces.Count);
+            return JsonConvert.SerializeObject(ints);
         }
 
         // GET: api/Spaces
