@@ -20,10 +20,10 @@ namespace Proftaak_S3_API.Controllers
             _context = context;
         }
 
-        [HttpGet("KentekenExists/{kenteken}")]
-        public async Task<bool> KentekenExists(string kenteken)
+        [HttpGet("LicenseExists/{license}")]
+        public async Task<bool> LicenseExists(string license)
         {
-            Car car = _context.Car.Where(c => c.Kenteken == kenteken).FirstOrDefault();
+            Car car = _context.Car.Where(c => c.Kenteken == license).FirstOrDefault();
 
             if(car != null)
             {
