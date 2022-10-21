@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -25,6 +26,14 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<IEnumerable<Reservations>>> GetReservations()
         {
             return await _context.Reservations.ToListAsync();
+        }
+
+        [HttpGet("User/{id}")]
+        public async Task<string> GetReservationsByUser(string id)
+        {
+            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID }).Where(c => c.UserID == id).ToListAsync();
+
+            return JsonConvert.SerializeObject(reservations);
         }
 
         // GET: api/Reservations/5
