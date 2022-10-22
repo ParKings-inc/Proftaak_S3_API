@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +48,35 @@ namespace Proftaak_S3_API.Controllers
             }
             return null;
         }
+
+        [HttpGet("reservations/create/getavailableSpace/{arrivalTime}/{endTime}/{garageId}")]
+        public async Task<string> GetAvailableSpaces(DateTime arrivalTime, DateTime endTime,int garageId)
+        {
+            Garage garage = _context.Garage.Where(g => g.Id == garageId).FirstOrDefault();
+            if (garage != null)
+            {
+                if(arrivalTime.TimeOfDay >= garage.OpeningTime.GetValueOrDefault().TimeOfDay && endTime.TimeOfDay <= garage.ClosingTime.GetValueOrDefault().TimeOfDay)
+                {
+                    var notAvailablespaces= (from s in _context.Reservations
+                                  join sa in _context.Space on s.SpaceID equals sa.ID
+                                  where sa.GarageID ==  garageId && 
+                                  ((s.ArrivalTime <= arrivalTime && s.ArrivalTime <= endTime && s.DepartureTime >=arrivalTime) || 
+                                  (s.ArrivalTime >= arrivalTime && s.ArrivalTime <=endTime)) 
+                                 select sa.ID).Distinct().ToArray();
+
+                    var availableSpaces = _context.Space.Where((s)=> !notAvailablespaces.Contains(s.ID));
+
+                    Debug.WriteLine(availableSpaces);
+
+
+                    return JsonConvert.SerializeObject(availableSpaces);
+                }
+            }
+
+           
+            return null;
+        }
+
 
         // GET: api/Spaces
         [HttpGet]
