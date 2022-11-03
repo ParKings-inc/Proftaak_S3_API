@@ -16,5 +16,7 @@ namespace Proftaak_S3_API.Models
         public DbSet<Space>? Space { get; set; }
         public DbSet<Receipt>? Receipt { get; set; }
         public DbSet<Pricing>? Pricing { get; set; }
+        public DbSet<Role>? Role { get; set; }
+        public DbSet<SpaceType>? SpaceType { get; set; }
     }
 }
