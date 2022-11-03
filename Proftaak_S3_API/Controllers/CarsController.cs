@@ -124,6 +124,20 @@ namespace Proftaak_S3_API.Controllers
             return car;
         }
 
+        [HttpGet("License/{license}")]
+        public async Task<ActionResult<Car>> GetCarByLicense(string license)
+        {
+            var car = await _context.Car.Where(c => c.Kenteken == license).FirstAsync();
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return car;
+        }
+
+
         private bool CarExists(int id)
         {
             return _context.Car.Any(e => e.Id == id);
