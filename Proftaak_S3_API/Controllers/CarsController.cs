@@ -111,6 +111,19 @@ namespace Proftaak_S3_API.Controllers
             return NoContent();
         }
 
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<IEnumerable<Car>>> GetCarByUser(string id)
+        {
+            var car = await _context.Car.Where(c => c.UserID == id).ToListAsync();
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return car;
+        }
+
         private bool CarExists(int id)
         {
             return _context.Car.Any(e => e.Id == id);
