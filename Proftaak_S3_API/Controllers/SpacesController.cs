@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -27,14 +28,15 @@ namespace Proftaak_S3_API.Controllers
         {
             Garage garage = _context.Garage.Where(g => g.Id == id).FirstOrDefault();
             // var usedSpaces = await _context.Reservations.Where(s =>  s.SpaceID == id).ToListAsync();
-            if(garage != null)
+            if (garage != null)
             {
                 var Spaces = await _context.Space.ToListAsync();
                 int count = 0;
                 var time = garage.ClosingTime.ToString();
                 var spaces = (from s in _context.Reservations
                               join sa in _context.Space on s.SpaceID equals sa.ID
-                              where sa.GarageID == id && s.ArrivalTime.Date == garage.ClosingTime.GetValueOrDefault().Date && s.ArrivalTime.TimeOfDay < garage.ClosingTime.GetValueOrDefault().TimeOfDay
+                              where sa.GarageID == id && ((s.ArrivalTime.Date == DateTime.Now.Date && s.DepartureTime.HasValue == false) ||
+                              (s.ArrivalTime.Date <=DateTime.Now.Date && s.DepartureTime.HasValue == true &&s.DepartureTime.Value >= DateTime.Now.Date))
                               select new { s.SpaceID }).Distinct();
                 var allSpaces = await _context.Space.Where(s => s.GarageID == id).ToListAsync();
 
@@ -47,6 +49,34 @@ namespace Proftaak_S3_API.Controllers
             }
             return null;
         }
+
+        [HttpGet("reservations/create/getavailableSpace/{arrivalTime}/{endTime}/{garageId}")]
+        public async Task<string> GetAvailableSpaces(DateTime arrivalTime, DateTime endTime,int garageId)
+        {
+            Garage garage = _context.Garage.Where(g => g.Id == garageId).FirstOrDefault();
+            if (garage != null)
+            {
+            if(arrivalTime.TimeOfDay > garage.OpeningTime.GetValueOrDefault().TimeOfDay && endTime.TimeOfDay< garage.ClosingTime.GetValueOrDefault().TimeOfDay)
+                {
+                    var notAvailablespaces = (from s in _context.Reservations
+                                              join sa in _context.Space on s.SpaceID equals sa.ID
+                                              where sa.GarageID == garageId &&
+                                              ((s.ArrivalTime <= arrivalTime && s.ArrivalTime <= endTime && s.DepartureTime >= arrivalTime) ||
+                                              (s.ArrivalTime >= arrivalTime && s.ArrivalTime <= endTime))
+                                              select sa.ID).Distinct().ToArray();
+
+                    var availableSpaces = _context.Space.Where((s) => !notAvailablespaces.Contains(s.ID));
+
+                    return JsonConvert.SerializeObject(availableSpaces);
+                }
+                   
+                
+            }
+
+           
+            return null;
+        }
+
 
         // GET: api/Spaces
         [HttpGet]
