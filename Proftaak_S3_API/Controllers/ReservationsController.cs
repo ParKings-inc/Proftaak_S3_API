@@ -87,6 +87,16 @@ namespace Proftaak_S3_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
+            var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
+
+            foreach (var res in ReservationsByCar)
+            {
+                if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
+                {
+                    return NotFound();
+                }
+            }
+
             _context.Reservations.Add(reservations);
             await _context.SaveChangesAsync();
 
