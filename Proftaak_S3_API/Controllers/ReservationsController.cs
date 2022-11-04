@@ -31,7 +31,8 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("User/{id}")]
         public async Task<string> GetReservationsByUser(string id)
         {
-            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id,SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID }).Where(c => c.UserID == id).ToListAsync();
+            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id, SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID, Kenteken = c.Kenteken, Status = r.Status })
+                .Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { ReservationID = r.Id, SpaceID = r.SpaceID, Kenteken = r.Kenteken, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = r.UserID, Status = r.Status, SpaceNumber = s.Spot, SpaceRow = s.Row, SpaceFloor = s.Floor }).Where(r => r.UserID == id).ToListAsync();
 
             return JsonConvert.SerializeObject(reservations);
         }
