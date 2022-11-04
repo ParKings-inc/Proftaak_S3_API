@@ -47,7 +47,7 @@ namespace Proftaak_S3_API.Controllers
                 ints.Add(allSpaces.Count);
                 return JsonConvert.SerializeObject(ints);
             }
-            return null;
+            return "No garage";
         }
 
         [HttpGet("reservations/create/getavailableSpace/{arrivalTime}/{endTime}/{garageId}")]
@@ -56,7 +56,7 @@ namespace Proftaak_S3_API.Controllers
             Garage garage = _context.Garage.Where(g => g.Id == garageId).FirstOrDefault();
             if (garage != null)
             {
-            if(arrivalTime.TimeOfDay > garage.OpeningTime.GetValueOrDefault().TimeOfDay && endTime.TimeOfDay< garage.ClosingTime.GetValueOrDefault().TimeOfDay)
+                if(arrivalTime.TimeOfDay > garage.OpeningTime.GetValueOrDefault().TimeOfDay && endTime.TimeOfDay< garage.ClosingTime.GetValueOrDefault().TimeOfDay)
                 {
                     var notAvailablespaces = (from s in _context.Reservations
                                               join sa in _context.Space on s.SpaceID equals sa.ID
@@ -69,12 +69,8 @@ namespace Proftaak_S3_API.Controllers
 
                     return JsonConvert.SerializeObject(availableSpaces);
                 }
-                   
-                
             }
-
-           
-            return null;
+            return "No garage";
         }
 
 
@@ -106,7 +102,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != space.ID)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(space).State = EntityState.Modified;

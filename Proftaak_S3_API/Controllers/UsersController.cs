@@ -57,7 +57,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != int.Parse(user.Id))
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(user).State = EntityState.Modified;

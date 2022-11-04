@@ -32,7 +32,10 @@ namespace Proftaak_S3_API.Controllers
         public async Task<string> GetReservationsByUser(string id)
         {
             var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id,SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID }).Where(c => c.UserID == id).ToListAsync();
-
+            if (reservations == null)
+            {
+                Problem("No reservations");
+            }
             return JsonConvert.SerializeObject(reservations);
         }
 
@@ -58,7 +61,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != reservations.Id)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(reservations).State = EntityState.Modified;
@@ -93,7 +96,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
                 {
-                    return NotFound();
+                    return BadRequest("Time period already used");
                 }
             }
 

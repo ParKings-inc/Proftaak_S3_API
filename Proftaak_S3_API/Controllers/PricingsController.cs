@@ -48,7 +48,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != pricing.ID)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(pricing).State = EntityState.Modified;
