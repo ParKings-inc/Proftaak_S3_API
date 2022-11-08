@@ -65,7 +65,7 @@ namespace Proftaak_S3_API.Controllers
                                               (s.ArrivalTime >= arrivalTime && s.ArrivalTime <= endTime))
                                               select sa.ID).Distinct().ToArray();
 
-                    var availableSpaces = _context.Space.Where((s) => !notAvailablespaces.Contains(s.ID));
+                    var availableSpaces = _context.Space.Where((s) => !notAvailablespaces.Contains(s.ID)).Where(s => s.GarageID == garageId);
 
                     return JsonConvert.SerializeObject(availableSpaces);
                 }
