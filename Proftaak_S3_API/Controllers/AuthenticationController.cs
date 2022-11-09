@@ -38,7 +38,7 @@ namespace Proftaak_S3_API.Controllers
             string jwt = _httpContextAccessor.HttpContext.Request.Cookies["jwt"];
             if (jwt == "" || jwt == null)
             {
-                return Ok("");
+                return BadRequest("empty jwt");
             } else
             {
                 return Ok(jwt);
