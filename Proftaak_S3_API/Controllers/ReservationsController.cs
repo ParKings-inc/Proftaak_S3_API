@@ -32,7 +32,7 @@ namespace Proftaak_S3_API.Controllers
         public async Task<string> GetReservationsByUser(string id)
         {
             var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id,SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID }).Where(c => c.UserID == id).ToListAsync();
-            if (reservations == null)
+            if (reservations == null || reservations.Count() == 0)
             {
                 Problem("No reservations");
             }
