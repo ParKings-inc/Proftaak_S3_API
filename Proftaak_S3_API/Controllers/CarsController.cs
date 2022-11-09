@@ -60,7 +60,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != car.Id)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(car).State = EntityState.Modified;

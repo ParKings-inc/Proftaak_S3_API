@@ -33,7 +33,12 @@ namespace Proftaak_S3_API.Controllers
         {
             var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id, SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID, Kenteken = c.Kenteken, Status = r.Status })
                 .Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { ReservationID = r.Id, SpaceID = r.SpaceID, Kenteken = r.Kenteken, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = r.UserID, Status = r.Status, SpaceNumber = s.Spot, SpaceRow = s.Row, SpaceFloor = s.Floor }).Where(r => r.UserID == id).ToListAsync();
-
+                
+            if (reservations == null || reservations.Count() == 0)
+            {
+                Problem("No reservations");
+            }
+  
             return JsonConvert.SerializeObject(reservations);
         }
 
@@ -59,7 +64,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != reservations.Id)
             {
-                return BadRequest();
+                return BadRequest("OOPS, something went wrong");
             }
 
             _context.Entry(reservations).State = EntityState.Modified;
@@ -94,7 +99,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
                 {
-                    return NotFound();
+                    return BadRequest("You already have a reservation for this license plate");
                 }
             }
 

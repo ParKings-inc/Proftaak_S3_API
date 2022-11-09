@@ -48,7 +48,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != receipt.ID)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(receipt).State = EntityState.Modified;

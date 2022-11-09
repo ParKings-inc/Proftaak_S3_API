@@ -35,10 +35,10 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Garage>> GetGarage(int id)
         {
-          if (_context.Garage == null)
-          {
-              return NotFound();
-          }
+            if (_context.Garage == null)
+            {
+                return NotFound();
+            }
             var garage = await _context.Garage.FindAsync(id);
 
             if (garage == null)
@@ -56,7 +56,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != garage.Id)
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(garage).State = EntityState.Modified;
