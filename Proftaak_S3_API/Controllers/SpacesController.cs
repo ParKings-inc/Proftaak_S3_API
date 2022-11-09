@@ -102,7 +102,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != space.ID)
             {
-                return BadRequest("id`s not the same");
+                return BadRequest("OOPS, something went wrong");
             }
 
             _context.Entry(space).State = EntityState.Modified;

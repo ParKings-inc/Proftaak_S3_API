@@ -61,7 +61,7 @@ namespace Proftaak_S3_API.Controllers
         {
             if (id != reservations.Id)
             {
-                return BadRequest("id`s not the same");
+                return BadRequest("OOPS, something went wrong");
             }
 
             _context.Entry(reservations).State = EntityState.Modified;
@@ -96,7 +96,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
                 {
-                    return BadRequest("Time period already used");
+                    return BadRequest("You already have a reservation for this license plate");
                 }
             }
 
