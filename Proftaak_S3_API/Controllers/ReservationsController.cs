@@ -64,11 +64,17 @@ namespace Proftaak_S3_API.Controllers
         public async Task<IActionResult> PutReservations(int id, Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
+            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
+            var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+
+            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            {
+                return BadRequest("Garage is niet open");
+            }
 
             foreach (var res in ReservationsByCar)
             {
-                var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
-                var DepartureTime = reservations.DepartureTime.AddMinutes(15);
                 if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
                     if (res.Id != reservations.Id)
@@ -110,11 +116,17 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
+            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
+            var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+
+            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            {
+                return BadRequest("Garage is niet open");
+            }
 
             foreach (var res in ReservationsByCar)
             {
-                var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
-                var DepartureTime = reservations.DepartureTime.AddMinutes(15);
                 if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
                     return BadRequest("You already have a reservation for this license plate");
