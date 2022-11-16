@@ -63,6 +63,16 @@ namespace Proftaak_S3_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservations(int id, Reservations reservations)
         {
+            var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
+
+            foreach (var res in ReservationsByCar)
+            {
+                if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
+                {
+                    return BadRequest("You already have a reservation for this license plate");
+                }
+            }
+
             if (id != reservations.Id)
             {
                 return BadRequest("OOPS, something went wrong");
