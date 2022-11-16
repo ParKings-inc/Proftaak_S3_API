@@ -67,7 +67,9 @@ namespace Proftaak_S3_API.Controllers
 
             foreach (var res in ReservationsByCar)
             {
-                if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
+                var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
+                var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+                if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
                     if (res.Id != reservations.Id)
                     {
@@ -111,7 +113,9 @@ namespace Proftaak_S3_API.Controllers
 
             foreach (var res in ReservationsByCar)
             {
-                if (res.ArrivalTime <= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime && res.DepartureTime >= reservations.ArrivalTime || res.ArrivalTime >= reservations.ArrivalTime && res.ArrivalTime <= reservations.DepartureTime)
+                var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
+                var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+                if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
                     return BadRequest("You already have a reservation for this license plate");
                 }
