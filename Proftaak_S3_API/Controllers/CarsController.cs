@@ -89,10 +89,17 @@ namespace Proftaak_S3_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Car>> PostCar(Car car)
         {
-            _context.Car.Add(car);
-            await _context.SaveChangesAsync();
+            if (LicenseExists(car.Kenteken).Result == false) {
+                _context.Car.Add(car);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCar", new { id = car.Id }, car);
+                return CreatedAtAction("GetCar", new { id = car.Id }, car);
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
         // DELETE: api/Cars/5
