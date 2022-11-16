@@ -70,7 +70,7 @@ namespace Proftaak_S3_API.Controllers
 
             if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
             {
-                return BadRequest("Garage is niet open");
+                return BadRequest("Garage is closed");
             }
 
             foreach (var res in ReservationsByCar)
@@ -122,7 +122,7 @@ namespace Proftaak_S3_API.Controllers
 
             if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
             {
-                return BadRequest("Garage is niet open");
+                return BadRequest("Garage is closed");
             }
 
             foreach (var res in ReservationsByCar)
