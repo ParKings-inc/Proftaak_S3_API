@@ -103,5 +103,34 @@ namespace Proftaak_S3_API.Controllers
         {
             return _context.Pricing.Any(e => e.ID == id);
         }
+
+        [HttpGet("Day/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByDay(DateTime day, int id)
+        {
+            var d = day.DayOfWeek;
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToRemove = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                if (price.StartingTime.Value.DayOfWeek != d)
+                {
+                    pricesToRemove.Add(price);
+                }
+            }
+
+            foreach (var price in pricesToRemove)
+            {
+                pricing.Remove(price);
+            }
+
+            if (pricing == null)
+            {
+                return NotFound();
+            }
+
+            return pricing;
+        } 
     }
 }
