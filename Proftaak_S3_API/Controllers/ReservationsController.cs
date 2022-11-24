@@ -64,9 +64,9 @@ namespace Proftaak_S3_API.Controllers
         public async Task<IActionResult> PutReservations(int id, Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            var garage = _context.Reservations.Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { s.GarageID }).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
-            var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+            var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
             if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
             {
@@ -116,9 +116,9 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            var garage = _context.Reservations.Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { s.GarageID }).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
-            var DepartureTime = reservations.DepartureTime.AddMinutes(15);
+            var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
             if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
             {
