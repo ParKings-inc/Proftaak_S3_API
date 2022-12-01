@@ -107,30 +107,59 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("Day/{day}/{id}")]
         public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByDay(DateTime day, int id)
         {
-            var d = day.DayOfWeek;
+            var d = day.Date;
 
             var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
-            List<Pricing> pricesToRemove = new List<Pricing>();
+            List<Pricing> pricesToReturn = new List<Pricing>();
 
             foreach (var price in pricing)
             {
-                if (price.StartingTime.Value.DayOfWeek != d)
+                if (price.StartingTime.Value.Date != d)
                 {
-                    pricesToRemove.Add(price);
+                    pricesToReturn.Add(price);
                 }
             }
 
-            foreach (var price in pricesToRemove)
-            {
-                pricing.Remove(price);
-            }
-
-            if (pricing == null)
+            if (pricesToReturn == null)
             {
                 return NotFound();
             }
 
-            return pricing;
-        } 
+            return pricesToReturn;
+        }
+
+        [HttpGet("Week/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByWeek(DateTime day, int id)
+        {
+            int currentDayOfWeek = (int)day.DayOfWeek;
+            DateTime sunday = day.AddDays(-currentDayOfWeek);
+            DateTime monday = sunday.AddDays(1);
+            if (currentDayOfWeek == 0)
+            {
+                monday = monday.AddDays(-7);
+            }
+            var dates = Enumerable.Range(0, 7).Select(days => monday.AddDays(days)).ToList();
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToReturn = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                for (int i = 0; i < dates.Count; i++)
+                {
+                    if (price.StartingTime.Value.Date == dates[i].Date)
+                    {
+                        pricesToReturn.Add(price);
+                    }
+                }
+            }
+
+            if (pricesToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return pricesToReturn;
+        }
     }
 }
