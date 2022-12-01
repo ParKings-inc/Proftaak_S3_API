@@ -75,12 +75,33 @@ namespace Proftaak_S3_API.Controllers
         // POST: api/Pricings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pricing>> PostPricing(Pricing pricing)
+        public async Task<ActionResult<Pricing>> PostPricing(Pricing price)
         {
-            _context.Pricing.Add(pricing);
+            var pricing = await _context.Pricing.Where(p => p.GarageID == price.GarageID).ToListAsync();
+            int counter = 0;
+
+            foreach (var p in pricing)
+            {
+                if (price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.StartingTime < p.EndingTime || price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.EndingTime > p.StartingTime)
+                {
+                    return BadRequest("Cant set recurring on the same time as another recurring date");
+                }
+
+                if (price.recurring == false && price.StartingTime.Value.Date == p.StartingTime.Value.Date && price.StartingTime < p.EndingTime || price.recurring == false && price.StartingTime.Value.Date == p.StartingTime.Value.Date && price.EndingTime > p.StartingTime)
+                {
+                    counter++;
+                }
+            }
+
+            if (counter > 1)
+            {
+                return BadRequest("Cant set 2 Prices on the same time and day");
+            }
+
+            _context.Pricing.Add(price);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPricing", new { id = pricing.ID }, pricing);
+            return CreatedAtAction("GetPricing", new { id = price.ID }, price);
         }
 
         // DELETE: api/Pricings/5
