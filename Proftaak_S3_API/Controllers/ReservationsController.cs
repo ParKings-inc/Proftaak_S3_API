@@ -68,7 +68,7 @@ namespace Proftaak_S3_API.Controllers
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
-            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            if (ArrivalTime.TimeOfDay < garage.OpeningTime.Value.TimeOfDay || DepartureTime.Value.TimeOfDay > garage.ClosingTime.Value.TimeOfDay)
             {
                 return BadRequest("Garage is closed");
             }
@@ -120,7 +120,7 @@ namespace Proftaak_S3_API.Controllers
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
-            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            if (ArrivalTime.TimeOfDay < garage.OpeningTime.Value.TimeOfDay || DepartureTime.Value.TimeOfDay > garage.ClosingTime.Value.TimeOfDay)
             {
                 return BadRequest("Garage is closed");
             }
