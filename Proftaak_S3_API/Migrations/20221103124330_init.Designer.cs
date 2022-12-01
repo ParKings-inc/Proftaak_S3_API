@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20221103124330_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,16 +77,6 @@ namespace Proftaak_S3_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Garage");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            MaxPrice = 5m,
-                            MaxSpace = 5,
-                            Name = "Test",
-                            NormalPrice = 0m
-                        });
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Pricing", b =>
@@ -95,7 +87,7 @@ namespace Proftaak_S3_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
-                    b.Property<DateTime?>("EndingTime")
+                    b.Property<DateTime>("EndingTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GarageID")
@@ -105,11 +97,8 @@ namespace Proftaak_S3_API.Migrations
                         .HasPrecision(9, 2)
                         .HasColumnType("decimal(9,2)");
 
-                    b.Property<DateTime?>("StartingTime")
+                    b.Property<DateTime>("StartingTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("recurring")
-                        .HasColumnType("bit");
 
                     b.HasKey("ID");
 
@@ -180,18 +169,6 @@ namespace Proftaak_S3_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "User"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Space", b =>
@@ -220,82 +197,23 @@ namespace Proftaak_S3_API.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Space");
-
-                    b.HasData(
-                        new
-                        {
-                            ID = 1,
-                            Floor = 1,
-                            GarageID = 1,
-                            Row = "a",
-                            Spot = 1,
-                            TypeId = 1
-                        },
-                        new
-                        {
-                            ID = 2,
-                            Floor = 1,
-                            GarageID = 1,
-                            Row = "a",
-                            Spot = 2,
-                            TypeId = 1
-                        },
-                        new
-                        {
-                            ID = 3,
-                            Floor = 1,
-                            GarageID = 1,
-                            Row = "a",
-                            Spot = 3,
-                            TypeId = 1
-                        },
-                        new
-                        {
-                            ID = 4,
-                            Floor = 1,
-                            GarageID = 1,
-                            Row = "b",
-                            Spot = 1,
-                            TypeId = 1
-                        },
-                        new
-                        {
-                            ID = 5,
-                            Floor = 2,
-                            GarageID = 1,
-                            Row = "a",
-                            Spot = 1,
-                            TypeId = 1
-                        });
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.SpaceType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
-                    b.Property<string>("Name")
+                    b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
                     b.ToTable("SpaceType");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Normal"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Electric"
-                        });
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.User", b =>

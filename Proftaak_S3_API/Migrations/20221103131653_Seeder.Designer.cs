@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20221103131653_Seeder")]
+    partial class Seeder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,7 +97,7 @@ namespace Proftaak_S3_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
 
-                    b.Property<DateTime?>("EndingTime")
+                    b.Property<DateTime>("EndingTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GarageID")
@@ -105,11 +107,8 @@ namespace Proftaak_S3_API.Migrations
                         .HasPrecision(9, 2)
                         .HasColumnType("decimal(9,2)");
 
-                    b.Property<DateTime?>("StartingTime")
+                    b.Property<DateTime>("StartingTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("recurring")
-                        .HasColumnType("bit");
 
                     b.HasKey("ID");
 

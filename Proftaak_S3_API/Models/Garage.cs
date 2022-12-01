@@ -1,13 +1,20 @@
-﻿namespace Proftaak_S3_API.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Proftaak_S3_API.Models
 {
     public class Garage
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public double Price { get; set; }
+
         public DateTime? OpeningTime { get; set; }
+
         public DateTime? ClosingTime { get; set; }
-        public int FreeSpace { get; set; }
         public int MaxSpace { get; set; }
+        [Precision(9, 2)]
+        public decimal NormalPrice { get; set; }
+        [Precision(9, 2)]
+        public decimal MaxPrice { get; set; }
     }
 }

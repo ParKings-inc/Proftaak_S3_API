@@ -55,9 +55,9 @@ namespace Proftaak_S3_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.Id)
+            if (id != int.Parse(user.Id))
             {
-                return BadRequest();
+                return BadRequest("id`s not the same");
             }
 
             _context.Entry(user).State = EntityState.Modified;
@@ -91,13 +91,14 @@ namespace Proftaak_S3_API.Controllers
             var token = handler.ReadJwtToken(jwt);
 
             User user = new User();
-            user.SubId = token.Subject;
+            user.Id = token.Subject;
+            user.RoleID = 1;
 
             if (_context.User == null)
             {
                 return Problem("Entity set 'ProftaakContext.User'  is null.");
             }
-            if ((_context.User?.Any(e => e.SubId == user.SubId)).GetValueOrDefault())
+            if ((_context.User?.Any(e => e.Id == user.Id)).GetValueOrDefault())
             {
                 return Ok();
             }
@@ -130,7 +131,8 @@ namespace Proftaak_S3_API.Controllers
 
         private bool UserExists(int id)
         {
-            return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.User?.Any(e => int.Parse(e.Id) == id)).GetValueOrDefault();
         }
     }
 }
+
