@@ -23,7 +23,7 @@ namespace Proftaak_S3_API.Controllers
 
         // GET: api/Reservations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Reservations>>> GetReservations()
+        public async Task<ActionResult<IEnumerable<Reservation>>> GetReservations()
         {
             return await _context.Reservations.ToListAsync();
         }
@@ -46,7 +46,7 @@ namespace Proftaak_S3_API.Controllers
 
         // GET: api/Reservations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Reservations>> GetReservations(int id)
+        public async Task<ActionResult<Reservation>> GetReservations(int id)
         {
             var reservations = await _context.Reservations.FindAsync(id);
 
@@ -61,10 +61,10 @@ namespace Proftaak_S3_API.Controllers
         // PUT: api/Reservations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutReservations(int id, Reservations reservations)
+        public async Task<IActionResult> PutReservations(int id, Reservation reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            Garage garage = await _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime.AddMinutes(15);
 
@@ -113,10 +113,10 @@ namespace Proftaak_S3_API.Controllers
         // POST: api/Reservations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
+        public async Task<ActionResult<Reservation>> PostReservations(Reservation reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            Garage garage = _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
+            Garage garage = await _context.Garage.Where(g => g.Id == reservations.Id).FirstAsync();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime.AddMinutes(15);
 

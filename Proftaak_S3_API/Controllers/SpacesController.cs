@@ -35,8 +35,8 @@ namespace Proftaak_S3_API.Controllers
                 var time = garage.ClosingTime.ToString();
                 var spaces = (from s in _context.Reservations
                               join sa in _context.Space on s.SpaceID equals sa.ID
-                              where sa.GarageID == id && ((s.ArrivalTime.Date == DateTime.Now.Date && s.DepartureTime.HasValue == false) ||
-                              (s.ArrivalTime.Date <=DateTime.Now.Date && s.DepartureTime.HasValue == true &&s.DepartureTime.Value >= DateTime.Now.Date))
+                              where sa.GarageID == id && ((s.ArrivalTime.Date == DateTime.Now.Date) ||
+                              (s.ArrivalTime.Date <=DateTime.Now.Date && s.DepartureTime >= DateTime.Now.Date))
                               select new { s.SpaceID }).Distinct();
                 var allSpaces = await _context.Space.Where(s => s.GarageID == id).ToListAsync();
 
