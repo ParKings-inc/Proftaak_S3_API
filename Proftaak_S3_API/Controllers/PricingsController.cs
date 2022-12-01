@@ -161,5 +161,39 @@ namespace Proftaak_S3_API.Controllers
 
             return pricesToReturn;
         }
+
+        [HttpGet("Month/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByMonth(DateTime day, int id)
+        {
+            int currentDayOfWeek = (int)day.DayOfWeek;
+            DateTime sunday = day.AddDays(-currentDayOfWeek);
+            DateTime monday = sunday.AddDays(1);
+            if (currentDayOfWeek == 0)
+            {
+                monday = monday.AddDays(-7);
+            }
+            var dates = Enumerable.Range(0, 32).Select(days => monday.AddDays(days)).ToList();
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToReturn = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                for (int i = 0; i < dates.Count; i++)
+                {
+                    if (price.StartingTime.Value.Date == dates[i].Date)
+                    {
+                        pricesToReturn.Add(price);
+                    }
+                }
+            }
+
+            if (pricesToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return pricesToReturn;
+        }
     }
 }
