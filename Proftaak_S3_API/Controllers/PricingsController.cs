@@ -77,6 +77,12 @@ namespace Proftaak_S3_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Pricing>> PostPricing(Pricing price)
         {
+            var DateDif = price.StartingTime - price.EndingTime;
+            if (DateDif.Value.Hours < 1)
+            {
+                return BadRequest("Price time needs to be at least 1 hour long");
+            }
+
             var pricing = await _context.Pricing.Where(p => p.GarageID == price.GarageID).ToListAsync();
             int counter = 0;
 
