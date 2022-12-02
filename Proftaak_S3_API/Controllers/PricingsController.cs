@@ -78,17 +78,13 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<Pricing>> PostPricing(Pricing price)
         {
             var DateDif = price.StartingTime - price.EndingTime;
-            if (DateDif.Value.Hours < 1)
-            {
-                return BadRequest("Price time needs to be at least 1 hour long");
-            }
-
+  
             var pricing = await _context.Pricing.Where(p => p.GarageID == price.GarageID).ToListAsync();
             int counter = 0;
 
             foreach (var p in pricing)
             {
-                if (price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.StartingTime < p.EndingTime || price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.EndingTime > p.StartingTime)
+                if (price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.StartingTime < p.EndingTime && p.recurring == true || price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.EndingTime > p.StartingTime && p.recurring == true)
                 {
                     return BadRequest("Cant set recurring on the same time as another recurring date");
                 }
