@@ -75,12 +75,35 @@ namespace Proftaak_S3_API.Controllers
         // POST: api/Pricings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pricing>> PostPricing(Pricing pricing)
+        public async Task<ActionResult<Pricing>> PostPricing(Pricing price)
         {
-            _context.Pricing.Add(pricing);
+            var DateDif = price.StartingTime - price.EndingTime;
+  
+            var pricing = await _context.Pricing.Where(p => p.GarageID == price.GarageID).ToListAsync();
+            int counter = 0;
+
+            foreach (var p in pricing)
+            {
+                if (price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.StartingTime < p.EndingTime && p.recurring == true || price.recurring == true && price.StartingTime.Value.DayOfWeek == p.StartingTime.Value.DayOfWeek && price.EndingTime > p.StartingTime && p.recurring == true)
+                {
+                    return BadRequest("Cant set recurring on the same time as another recurring date");
+                }
+
+                if (price.recurring == false && price.StartingTime.Value.Date == p.StartingTime.Value.Date && price.StartingTime < p.EndingTime || price.recurring == false && price.StartingTime.Value.Date == p.StartingTime.Value.Date && price.EndingTime > p.StartingTime)
+                {
+                    counter++;
+                }
+            }
+
+            if (counter > 1)
+            {
+                return BadRequest("Cant set 2 Prices on the same time and day");
+            }
+
+            _context.Pricing.Add(price);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPricing", new { id = pricing.ID }, pricing);
+            return CreatedAtAction("GetPricing", new { id = price.ID }, price);
         }
 
         // DELETE: api/Pricings/5
@@ -102,6 +125,98 @@ namespace Proftaak_S3_API.Controllers
         private bool PricingExists(int id)
         {
             return _context.Pricing.Any(e => e.ID == id);
+        }
+
+        [HttpGet("Day/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByDay(DateTime day, int id)
+        {
+            var d = day.Date;
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToReturn = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                if (price.StartingTime.Value.Date != d)
+                {
+                    pricesToReturn.Add(price);
+                }
+            }
+
+            if (pricesToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return pricesToReturn;
+        }
+
+        [HttpGet("Week/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByWeek(DateTime day, int id)
+        {
+            int currentDayOfWeek = (int)day.DayOfWeek;
+            DateTime sunday = day.AddDays(-currentDayOfWeek);
+            DateTime monday = sunday.AddDays(1);
+            if (currentDayOfWeek == 0)
+            {
+                monday = monday.AddDays(-7);
+            }
+            var dates = Enumerable.Range(0, 7).Select(days => monday.AddDays(days)).ToList();
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToReturn = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                for (int i = 0; i < dates.Count; i++)
+                {
+                    if (price.StartingTime.Value.Date == dates[i].Date)
+                    {
+                        pricesToReturn.Add(price);
+                    }
+                }
+            }
+
+            if (pricesToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return pricesToReturn;
+        }
+
+        [HttpGet("Month/{day}/{id}")]
+        public async Task<ActionResult<IEnumerable<Pricing>>> GetPricesByMonth(DateTime day, int id)
+        {
+            int currentDayOfWeek = (int)day.DayOfWeek;
+            DateTime sunday = day.AddDays(-currentDayOfWeek);
+            DateTime monday = sunday.AddDays(1);
+            if (currentDayOfWeek == 0)
+            {
+                monday = monday.AddDays(-7);
+            }
+            var dates = Enumerable.Range(0, 32).Select(days => monday.AddDays(days)).ToList();
+
+            var pricing = await _context.Pricing.Where(p => p.GarageID == id).ToListAsync();
+            List<Pricing> pricesToReturn = new List<Pricing>();
+
+            foreach (var price in pricing)
+            {
+                for (int i = 0; i < dates.Count; i++)
+                {
+                    if (price.StartingTime.Value.Date == dates[i].Date)
+                    {
+                        pricesToReturn.Add(price);
+                    }
+                }
+            }
+
+            if (pricesToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return pricesToReturn;
         }
     }
 }
