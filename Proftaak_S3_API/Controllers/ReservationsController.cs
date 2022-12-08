@@ -43,6 +43,22 @@ namespace Proftaak_S3_API.Controllers
             return JsonConvert.SerializeObject(reservations);
         }
 
+        [HttpGet("Admin/Reservation")]
+        public async Task<string> GetReservationsByAdmin()
+        {
+            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id, SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID, Kenteken = c.Kenteken, Status = r.Status })
+               .Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { ReservationID = r.Id, SpaceID = r.SpaceID, Kenteken = r.Kenteken, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = r.UserID, Status = r.Status, SpaceNumber = s.Spot, SpaceRow = s.Row, SpaceFloor = s.Floor, GarageID = s.GarageID })
+               .Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { GarageName = g.Name, ReservationID = s.ReservationID, SpaceID = s.SpaceID, Kenteken = s.Kenteken, CarID = s.CarID, ArrivalTime = s.ArrivalTime, DepartureTime = s.DepartureTime, UserID = s.UserID, Status = s.Status, SpaceNumber = s.SpaceNumber, SpaceRow = s.SpaceRow, SpaceFloor = s.SpaceFloor, GarageID = s.GarageID })
+               .ToListAsync();
+
+            if (reservations == null || reservations.Count() == 0)
+            {
+                Problem("No reservations");
+            }
+
+            return JsonConvert.SerializeObject(reservations);
+        }
+
 
         // GET: api/Reservations/5
         [HttpGet("{id}")]
@@ -64,11 +80,11 @@ namespace Proftaak_S3_API.Controllers
         public async Task<IActionResult> PutReservations(int id, Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            var garage = _context.Reservations.Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { s.GarageID }).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
+            var garage = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
-            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            if (ArrivalTime.TimeOfDay < garage.OpeningTime.Value.TimeOfDay || DepartureTime.Value.TimeOfDay > garage.ClosingTime.Value.TimeOfDay)
             {
                 return BadRequest("Garage is closed");
             }
@@ -116,11 +132,11 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
-            var garage = _context.Reservations.Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { s.GarageID }).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
+            var garage = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
 
-            if (ArrivalTime < garage.OpeningTime || DepartureTime > garage.ClosingTime)
+            if (ArrivalTime.TimeOfDay < garage.OpeningTime.Value.TimeOfDay || DepartureTime.Value.TimeOfDay > garage.ClosingTime.Value.TimeOfDay)
             {
                 return BadRequest("Garage is closed");
             }
