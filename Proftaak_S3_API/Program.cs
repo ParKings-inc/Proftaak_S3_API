@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Proftaak_S3_API.Models;
+using Proftaak_S3_API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ProftaakContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")));
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options => {
+        options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 builder.Services.AddCors();
 
@@ -28,11 +34,14 @@ app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials());
+app.UseCors("ClientPermission");
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<SpaceHub>("/hubs/spaces");
 
 app.Run();
