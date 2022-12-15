@@ -17,6 +17,7 @@ namespace Proftaak_S3_API.Models
         public DbSet<Pricing>? Pricing { get; set; }
         public DbSet<Role>? Role { get; set; }
         public DbSet<SpaceType>? SpaceType { get; set; }
+        public DbSet<SpaceStatus>? SpeceStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
