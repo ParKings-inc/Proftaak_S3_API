@@ -17,10 +17,11 @@ namespace Proftaak_S3_API.Models
         public DbSet<Pricing>? Pricing { get; set; }
         public DbSet<Role>? Role { get; set; }
         public DbSet<SpaceType>? SpaceType { get; set; }
-        public DbSet<SpaceStatus>? SpeceStatus { get; set; }
+        public DbSet<SpaceStatus>? SpaceStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SpaceStatus>().HasData(new SpaceStatus { Id = 1, Name = "Available" }, new SpaceStatus { Id = 2, Name = "Occupied" }, new SpaceStatus { Id = 3, Name = "Unavailable" });
             modelBuilder.Entity<Garage>().HasData(new Garage { Id = 1, Name = "Test", MaxSpace = 5, MaxPrice = 5 });
             modelBuilder.Entity<Space>().HasData(
                 new Space { ID = 1, GarageID = 1, Floor = 1, Row = "a", Spot = 1, TypeId = 1 },
