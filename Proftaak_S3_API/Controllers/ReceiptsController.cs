@@ -20,21 +20,12 @@ namespace Proftaak_S3_API.Controllers
         {
             _context = context;
         }
-
         // GET: api/Receipts
         [HttpGet]
-        public async Task<string> GetReceipt()
+        public async Task<ActionResult<IEnumerable<Receipt>>> GetReceipt()
         {
-            var receipts = await _context.Receipt.Join(_context.Reservations, rec => rec.ReservationID, r => r.Id, (rec, r) => new { rec.ID, r.SpaceID, rec.Price, r.ArrivalTime, r.DepartureTime }).ToListAsync();
-
-            if (receipts == null || receipts.Count() == 0)
-            {
-                Problem("No receipts");
-            }
-
-            return JsonConvert.SerializeObject(receipts);
+            return await _context.Receipt.ToListAsync();
         }
-
         // GET: api/Receipts/5
         [HttpGet("{id}")]
         public async Task<string> GetReceipt(int id)
@@ -47,6 +38,19 @@ namespace Proftaak_S3_API.Controllers
             }
 
             return JsonConvert.SerializeObject(receipt);
+        }
+
+        [HttpGet("User/{id}")]
+        public async Task<string> GetReceiptByUser(string id)
+        {
+            var receipts = await _context.Receipt.Join(_context.Reservations, rec => rec.ReservationID, r => r.Id, (rec, r) => new { rec.ID, r.SpaceID, r.CarID, rec.Price, r.ArrivalTime, r.DepartureTime }).Join(_context.Car, r => r.CarID, s => s.Id, (r, s) => new { r.ID, r.SpaceID, r.CarID, s.UserID, r.Price, r.ArrivalTime, r.DepartureTime }).Where(r => r.UserID == id).ToListAsync();
+
+            if (receipts == null || receipts.Count() == 0)
+            {
+                Problem("No receipts");
+            }
+
+            return JsonConvert.SerializeObject(receipts);
         }
 
         // PUT: api/Receipts/5
