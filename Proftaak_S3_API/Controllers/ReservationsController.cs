@@ -155,18 +155,85 @@ namespace Proftaak_S3_API.Controllers
             #endregion
 
             #region PostReceipt
-            TimeSpan hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
 
-            decimal normalPrice = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
+
+            List<Pricing> pricing = _context.Pricing.Where(p => p.StartingTime < reservations.ArrivalTime && p.EndingTime < reservations.DepartureTime.Value).ToList();
+
+            if (pricing != null && pricing.Count() != 0)
+            {
+                decimal TotalPrice = 0;
+                decimal normalPrice = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
+                TimeSpan hours;
+                TimeSpan hoursToRemove = new TimeSpan();
+
+                foreach (var price in pricing)
+                {
+                    if (price.StartingTime > reservations.ArrivalTime)
+                    {
+                        if (price.EndingTime > reservations.DepartureTime)
+                        {
+                            hours = reservations.DepartureTime.Value - price.StartingTime.Value;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                        else
+                        {
+                            hours = price.EndingTime.Value - price.StartingTime.Value;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                    }
+                    else
+                    {
+                        if (price.EndingTime > reservations.DepartureTime)
+                        {
+                            hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                        else
+                        {
+                            hours = price.EndingTime.Value - reservations.ArrivalTime;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                    }
+                }
+
+                hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+                if (hours > hoursToRemove)
+                {
+                    hours -= hoursToRemove;
+                    decimal priceToAdd = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                    TotalPrice += priceToAdd;
+                }
+
+                TotalPrice = decimal.Parse(TotalPrice.ToString("0.00"));
+                Receipt receipt = new Receipt { ReservationID = reservations.Id, Price = TotalPrice };
+
+                _context.Receipt.Add(receipt);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                TimeSpan hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+
+                decimal normalPrice = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
+
+                decimal price = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
+
+                price = decimal.Parse(price.ToString("0.00"));
+
+                Receipt receipt = new Receipt { ReservationID = reservations.Id, Price = price };
+
+                _context.Receipt.Add(receipt);
+                await _context.SaveChangesAsync();
+            }
             
-            decimal price = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
-
-            price = decimal.Parse(price.ToString("0.00"));
-
-            Receipt receipt = new Receipt { ReservationID = reservations.Id, Price = price };
-
-            _context.Receipt.Add(receipt);
-            await _context.SaveChangesAsync();
             #endregion
 
             return CreatedAtAction("GetReservations", new { id = reservations.Id }, reservations);
