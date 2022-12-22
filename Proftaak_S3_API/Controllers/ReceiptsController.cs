@@ -41,6 +41,26 @@ namespace Proftaak_S3_API.Controllers
             return receipt;
         }
 
+        // GET: api/Receipts/byday/5
+        [HttpGet("byday/{currentDay}")]
+        public async Task<ActionResult<decimal>> GetReceiptsByDay(DateTime currentDay)
+        {
+            var currentDayReservations = _context.Reservations.Where(g => g.DepartureTime.Value.Date == currentDay).ToListAsync();
+            var idListReservations = new List<int>();
+            foreach (var reservation in currentDayReservations.Result)
+            {
+                idListReservations.Add(reservation.Id);
+            }
+            var receiptsByReservationId = await _context.Receipt.Where(r => idListReservations.Contains(r.ReservationID)).ToListAsync();
+            decimal totalRevenue = 0;
+            foreach (var receipt in receiptsByReservationId)
+            {
+                totalRevenue += receipt.Price;
+            }
+
+            return totalRevenue;
+        }
+
         // PUT: api/Receipts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

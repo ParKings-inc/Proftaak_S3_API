@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Proftaak_S3_API.Hubs.Clients;
+using Proftaak_S3_API.Hubs;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -15,10 +18,12 @@ namespace Proftaak_S3_API.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
 
-        public ReservationsController(ProftaakContext context)
+        public ReservationsController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub)
         {
             _context = context;
+            _spaceHub = spaceHub;
         }
 
         // GET: api/Reservations
@@ -150,7 +155,7 @@ namespace Proftaak_S3_API.Controllers
             }
 
             _context.Reservations.Add(reservations);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();            
 
             return CreatedAtAction("GetReservations", new { id = reservations.Id }, reservations);
         }

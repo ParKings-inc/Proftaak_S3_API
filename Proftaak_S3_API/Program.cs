@@ -43,5 +43,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<SpaceHub>("/hubs/spaces");
+app.MapHub<RevenueHub>("/hubs/revenue");
 
 app.Run();
