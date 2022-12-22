@@ -202,6 +202,13 @@ namespace Proftaak_S3_API.Controllers
                             TotalPrice += priceToAdd;
                         }
                     }
+
+                    List<Pricing> pricingOverlap = pricing.Where(p => p.StartingTime.Value.TimeOfDay < price.StartingTime.Value.TimeOfDay && p.EndingTime.Value.TimeOfDay < price.EndingTime.Value.TimeOfDay).ToList();
+
+                    foreach (var pOverlap in pricingOverlap)
+                    {
+
+                    }
                 }
 
                 hours = reservations.DepartureTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
