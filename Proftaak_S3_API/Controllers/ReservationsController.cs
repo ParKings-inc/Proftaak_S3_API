@@ -157,7 +157,7 @@ namespace Proftaak_S3_API.Controllers
             #region PostReceipt
 
 
-            List<Pricing> pricing = _context.Pricing.Where(p => p.StartingTime < reservations.ArrivalTime && p.EndingTime < reservations.DepartureTime.Value).ToList();
+            List<Pricing> pricing = _context.Pricing.Where(p => p.StartingTime.Value.TimeOfDay < reservations.ArrivalTime.TimeOfDay && p.EndingTime.Value.TimeOfDay < reservations.DepartureTime.Value.TimeOfDay && p.StartingTime.Value.DayOfWeek == reservations.ArrivalTime.DayOfWeek).ToList();
 
             if (pricing != null && pricing.Count() != 0)
             {
@@ -168,18 +168,18 @@ namespace Proftaak_S3_API.Controllers
 
                 foreach (var price in pricing)
                 {
-                    if (price.StartingTime > reservations.ArrivalTime)
+                    if (price.StartingTime.Value.TimeOfDay > reservations.ArrivalTime.TimeOfDay)
                     {
-                        if (price.EndingTime > reservations.DepartureTime)
+                        if (price.EndingTime.Value.TimeOfDay > reservations.DepartureTime.Value.TimeOfDay)
                         {
-                            hours = reservations.DepartureTime.Value - price.StartingTime.Value;
+                            hours = reservations.DepartureTime.Value.TimeOfDay - price.StartingTime.Value.TimeOfDay;
                             hoursToRemove += hours;
                             decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
                             TotalPrice += priceToAdd;
                         }
                         else
                         {
-                            hours = price.EndingTime.Value - price.StartingTime.Value;
+                            hours = price.EndingTime.Value.TimeOfDay - price.StartingTime.Value.TimeOfDay;
                             hoursToRemove += hours;
                             decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
                             TotalPrice += priceToAdd;
@@ -187,16 +187,16 @@ namespace Proftaak_S3_API.Controllers
                     }
                     else
                     {
-                        if (price.EndingTime > reservations.DepartureTime)
+                        if (price.EndingTime.Value.TimeOfDay > reservations.DepartureTime.Value.TimeOfDay)
                         {
-                            hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+                            hours = reservations.DepartureTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
                             hoursToRemove += hours;
                             decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
                             TotalPrice += priceToAdd;
                         }
                         else
                         {
-                            hours = price.EndingTime.Value - reservations.ArrivalTime;
+                            hours = price.EndingTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
                             hoursToRemove += hours;
                             decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
                             TotalPrice += priceToAdd;
@@ -204,7 +204,7 @@ namespace Proftaak_S3_API.Controllers
                     }
                 }
 
-                hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+                hours = reservations.DepartureTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
                 if (hours > hoursToRemove)
                 {
                     hours -= hoursToRemove;
