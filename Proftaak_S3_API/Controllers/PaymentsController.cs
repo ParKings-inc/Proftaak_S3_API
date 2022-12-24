@@ -6,6 +6,7 @@ using Mollie.Api.Models.List;
 using Mollie.Api.Models.Payment;
 using Mollie.Api.Models.Payment.Request;
 using Mollie.Api.Models.Payment.Response;
+using Proftaak_S3_API.Models;
 using System.Globalization;
 
 namespace Proftaak_S3_API.Controllers
@@ -20,14 +21,14 @@ namespace Proftaak_S3_API.Controllers
             paymentClient = new PaymentClient("test_3zANg8a2rfkhPuK7GnN7QrewHxRmRd");
         }
 
-        [HttpPost("{cost}")]
-        public async Task<ActionResult<PaymentResponse>> CreatePayment(decimal cost)
+        [HttpPost]
+        public async Task<ActionResult<PaymentResponse>> CreatePayment(Payment payment)
         {
             PaymentRequest paymentRequest = new PaymentRequest()
             {
-                Amount = new Amount(Currency.EUR, cost),
+                Amount = new Amount(Currency.EUR, payment.Cost),
                 Description = "Parking fees",
-                RedirectUrl = "http://localhost:3000/",
+                RedirectUrl = "http://localhost:3000/?rid="+payment.ReservationID,
             };
 
             PaymentResponse paymentResponse = await paymentClient.CreatePaymentAsync(paymentRequest);
