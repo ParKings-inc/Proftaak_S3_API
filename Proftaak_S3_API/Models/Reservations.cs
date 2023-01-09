@@ -8,6 +8,6 @@
         public string Status { get; set; }
         public DateTime ArrivalTime { get; set; }
         public DateTime? DepartureTime { get; set; }
-        public string payment_id { get; set; }
+        public string? payment_id { get; set; }
     }
 }
