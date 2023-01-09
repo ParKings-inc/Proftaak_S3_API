@@ -87,6 +87,12 @@ namespace Proftaak_S3_API.Controllers
             return await _context.Space.ToListAsync();
         }
 
+        [HttpGet("status")]
+        public async Task<ActionResult<IEnumerable<SpaceStatus>>> GetSpaceStatus()
+        {
+            return await _context.SpaceStatus.ToListAsync();
+        }
+
         // GET: api/Spaces/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Space>> GetSpace(int id)
