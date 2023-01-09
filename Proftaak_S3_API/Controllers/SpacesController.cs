@@ -22,8 +22,14 @@ namespace Proftaak_S3_API.Controllers
             _context = context;
         }
 
+        [HttpGet("garage/{id}")]
+        public async Task<ActionResult<IEnumerable<Space>>> GetSpacesForGarage(int id)
+        {
+            return await _context.Space.Where(s=>s.GarageID == id).ToListAsync();
+        }
 
-        [HttpGet("FreeSpaces/{id}")]
+
+            [HttpGet("FreeSpaces/{id}")]
         public async Task<string> GetFreeSpaces(int id)
         {
             Garage garage = _context.Garage.Where(g => g.Id == id).FirstOrDefault();
@@ -79,6 +85,12 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<IEnumerable<Space>>> GetSpace()
         {
             return await _context.Space.ToListAsync();
+        }
+
+        [HttpGet("status")]
+        public async Task<ActionResult<IEnumerable<SpaceStatus>>> GetSpaceStatus()
+        {
+            return await _context.SpaceStatus.ToListAsync();
         }
 
         // GET: api/Spaces/5

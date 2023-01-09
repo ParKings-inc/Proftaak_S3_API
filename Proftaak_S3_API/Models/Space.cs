@@ -8,5 +8,6 @@
         public string? Row { get; set; }
         public int Spot { get; set; }
         public int TypeId { get; set; }
+        public int? StatusId { get; set; }
     }
 }

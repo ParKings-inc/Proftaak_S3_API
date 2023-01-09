@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20221215121402_status_table")]
+    partial class status_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,10 +162,6 @@ namespace Proftaak_S3_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("payment_id")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Reservations");
@@ -290,24 +288,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceStatus");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Available"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Occupied"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Unavailable"
-                        });
+                    b.ToTable("SpeceStatus");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.SpaceType", b =>
