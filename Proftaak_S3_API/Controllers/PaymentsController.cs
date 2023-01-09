@@ -28,7 +28,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 Amount = new Amount(Currency.EUR, payment.Cost),
                 Description = "Parking fees",
-                RedirectUrl = "http://localhost:3000/?rid="+payment.ReservationID,
+                RedirectUrl = "http://localhost:3000/reservations?rid=" + payment.ReservationID,
             };
 
             PaymentResponse paymentResponse = await paymentClient.CreatePaymentAsync(paymentRequest);
