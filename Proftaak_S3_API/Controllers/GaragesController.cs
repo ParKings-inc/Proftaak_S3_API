@@ -117,11 +117,24 @@ namespace Proftaak_S3_API.Controllers
                 return false;
             }
 
-            Reservations? reservation = await _context.Reservations!.FirstOrDefaultAsync(i => i.CarID == car.Id);
+            Reservations? reservation = await _context.GetReservation(licencePlate, garageId, true);
             if (reservation == null) {
                 return await TryCreateNewReservation(garageId, car);
             }
             return await TryEnterWithExistingReservation(garageId, reservation, car);
+        }
+
+        [HttpPut("LeaveGarage/{garageId}/{licencePlate}")]
+        public async Task<bool> LeaveGarage(int garageId, string licencePlate) {
+            Reservations? reservation = await _context.GetReservation(licencePlate, garageId, false);
+            if (reservation == null) {
+                return false;
+            }
+
+            reservation.DepartureTime = DateTime.Now;
+            reservation.Status = "Awaiting payment";
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         private async Task<bool> TryEnterWithExistingReservation(int garageId, Reservations reservation, Car car) {
