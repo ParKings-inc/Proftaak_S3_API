@@ -19,6 +19,19 @@ namespace Proftaak_S3_API.Models
         public DbSet<SpaceType>? SpaceType { get; set; }
         public DbSet<SpaceStatus>? SpaceStatus { get; set; }
 
+        public async Task<Reservations?> GetReservation(string licencePlate, int garageId, bool checkTime) {
+            Car? car = await Car!.FirstOrDefaultAsync(i => i.Kenteken == licencePlate);
+            if (car == null) {
+                return null;
+            }
+            List<Space> spaces = Space!.Where(s => s.GarageID == garageId).ToList();
+            List<Reservations> reservations = await Reservations!.Where(i => i.CarID == car.Id).ToListAsync();
+            if (checkTime) {
+                reservations = reservations.Where(i => i.DepartureTime == null || i.DepartureTime > DateTime.Now).ToList();
+            }
+            return reservations.LastOrDefault(i => spaces.Any(s => s.ID == i.SpaceID));
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SpaceStatus>().HasData(new SpaceStatus { Id = 1, Name = "Available" }, new SpaceStatus { Id = 2, Name = "Occupied" }, new SpaceStatus { Id = 3, Name = "Unavailable" });
