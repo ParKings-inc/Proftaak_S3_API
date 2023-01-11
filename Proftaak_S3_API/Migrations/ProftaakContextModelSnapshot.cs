@@ -40,7 +40,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Car");
+                    b.ToTable("Car", (string)null);
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Garage", b =>
@@ -74,7 +74,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Garage");
+                    b.ToTable("Garage", (string)null);
 
                     b.HasData(
                         new
@@ -113,7 +113,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Pricing");
+                    b.ToTable("Pricing", (string)null);
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Receipt", b =>
@@ -133,7 +133,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Receipt");
+                    b.ToTable("Receipt", (string)null);
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Reservations", b =>
@@ -161,12 +161,11 @@ namespace Proftaak_S3_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("payment_id")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Role", b =>
@@ -183,7 +182,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role", (string)null);
 
                     b.HasData(
                         new
@@ -226,7 +225,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Space");
+                    b.ToTable("Space", (string)null);
 
                     b.HasData(
                         new
@@ -290,7 +289,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceStatus");
+                    b.ToTable("SpaceStatus", (string)null);
 
                     b.HasData(
                         new
@@ -324,7 +323,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceType");
+                    b.ToTable("SpaceType", (string)null);
 
                     b.HasData(
                         new
@@ -349,7 +348,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 #pragma warning restore 612, 618
         }
