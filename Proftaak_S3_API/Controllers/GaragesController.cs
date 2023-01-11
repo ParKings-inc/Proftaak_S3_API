@@ -290,6 +290,8 @@ namespace Proftaak_S3_API.Controllers
 
             #endregion
 
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
             return true;
         }
 
