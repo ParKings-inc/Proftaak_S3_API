@@ -49,7 +49,7 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("User/{id}")]
         public async Task<string> GetReceiptByUser(string id)
         {
-            var receipts = await _context.Receipt.Join(_context.Reservations, rec => rec.ReservationID, r => r.Id, (rec, r) => new { rec.ID, r.SpaceID, r.CarID, rec.Price, r.ArrivalTime, r.DepartureTime }).Join(_context.Car, r => r.CarID, s => s.Id, (r, s) => new { r.ID, r.SpaceID, r.CarID, s.UserID, r.Price, r.ArrivalTime, r.DepartureTime }).Where(r => r.UserID == id).ToListAsync();
+            var receipts = await _context.Receipt.Join(_context.Reservations, rec => rec.ReservationID, r => r.Id, (rec, r) => new {r.Id, rec.ID, r.SpaceID, r.CarID, rec.Price, r.ArrivalTime, r.DepartureTime,r.Status }).Join(_context.Car, r => r.CarID, s => s.Id, (r, s) => new { r.Id,r.ID, r.SpaceID, r.CarID, s.UserID,r.Status, r.Price, r.ArrivalTime, r.DepartureTime }).Where(r => r.UserID == id).ToListAsync();
 
             if (receipts == null || receipts.Count() == 0)
             {
