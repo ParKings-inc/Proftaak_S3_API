@@ -12,7 +12,7 @@ namespace Proftaak_S3_API.Migrations
                 name: "payment_id",
                 table: "Reservations",
                 type: "nvarchar(max)",
-                nullable: false,
+                nullable: true,
                 oldClrType: typeof(int),
                 oldType: "int");
         }
@@ -23,7 +23,7 @@ namespace Proftaak_S3_API.Migrations
                 name: "payment_id",
                 table: "Reservations",
                 type: "int",
-                nullable: false,
+                nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
         }

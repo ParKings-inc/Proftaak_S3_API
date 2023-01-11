@@ -93,7 +93,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
-                    if (res.Id != reservations.Id)
+                    if (res.Id != reservations.Id && reservations.Status !="Awaiting payment" && reservations.Status != "Paid")
                     {
                         return BadRequest("You already have a reservation for this license plate");
                     }

@@ -140,7 +140,20 @@ namespace Proftaak_S3_API.Controllers
         private async Task<bool> TryEnterWithExistingReservation(int garageId, Reservations reservation, Car car) {
             if (reservation.Status != "Accepted") {
                 return await TryCreateNewReservation(garageId, car);
+            } else
+            {
+                reservation.ArrivalTime = DateTime.Now;
+                _context.Entry(reservation).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch 
+                {
+                }
             }
+
             return true;
         }
 
