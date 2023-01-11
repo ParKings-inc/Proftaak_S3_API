@@ -156,8 +156,24 @@ namespace Proftaak_S3_API.Controllers
 
             #region PostReceipt
 
-
-            List<Pricing> pricing = _context.Pricing.Where(p => p.StartingTime.Value.TimeOfDay < reservations.ArrivalTime.TimeOfDay && p.EndingTime.Value.TimeOfDay < reservations.DepartureTime.Value.TimeOfDay && p.StartingTime.Value.DayOfWeek == reservations.ArrivalTime.DayOfWeek).ToList();
+            List<Pricing> pricing = new List<Pricing>();
+            try
+            {
+                List<Pricing> p;
+                p = _context.Pricing.ToList();
+                foreach (var price in p)
+                {
+                    if (price.StartingTime.Value.TimeOfDay < reservations.ArrivalTime.TimeOfDay || price.EndingTime.Value.TimeOfDay < reservations.DepartureTime.Value.TimeOfDay && price.StartingTime.Value.DayOfWeek == reservations.ArrivalTime.DayOfWeek)
+                    {
+                        pricing.Add(price);
+                    }
+                    
+                }
+            }
+            catch (Exception)
+            {
+                pricing = null;
+            }
 
             if (pricing != null && pricing.Count() != 0)
             {
@@ -203,11 +219,53 @@ namespace Proftaak_S3_API.Controllers
                         }
                     }
 
-                    List<Pricing> pricingOverlap = pricing.Where(p => p.StartingTime.Value.TimeOfDay < price.StartingTime.Value.TimeOfDay && p.EndingTime.Value.TimeOfDay < price.EndingTime.Value.TimeOfDay).ToList();
+                    List<Pricing> pricingOverlap = pricing.Where(p => p.StartingTime.Value.TimeOfDay < price.StartingTime.Value.TimeOfDay || p.EndingTime.Value.TimeOfDay < price.EndingTime.Value.TimeOfDay).ToList();
 
                     foreach (var pOverlap in pricingOverlap)
                     {
-
+                        if (pOverlap.recurring != true)
+                        {
+                            foreach (var p in pricingOverlap)
+                            {
+                                if (p.StartingTime.Value.TimeOfDay <= pOverlap.StartingTime.Value.TimeOfDay && p.EndingTime.Value.TimeOfDay <= pOverlap.EndingTime.Value.TimeOfDay)
+                                {
+                                    if (pOverlap.StartingTime.Value.TimeOfDay >= p.StartingTime.Value.TimeOfDay)
+                                    {
+                                        if (pOverlap.EndingTime.Value.TimeOfDay >= p.EndingTime.Value.TimeOfDay)
+                                        {
+                                            hours = p.EndingTime.Value.TimeOfDay - pOverlap.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                        else
+                                        {
+                                            hours = pOverlap.EndingTime.Value.TimeOfDay - pOverlap.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (pOverlap.EndingTime.Value.TimeOfDay >= p.EndingTime.Value.TimeOfDay)
+                                        {
+                                            hours = p.EndingTime.Value.TimeOfDay - p.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                        else
+                                        {
+                                            hours = pOverlap.EndingTime.Value.TimeOfDay - p.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
