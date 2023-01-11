@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
+using Microsoft.AspNetCore.SignalR;
+using Proftaak_S3_API.Hubs;
+using Proftaak_S3_API.Hubs.Clients;
 
 namespace Proftaak_S3_API.Controllers
 {
@@ -14,10 +19,12 @@ namespace Proftaak_S3_API.Controllers
     public class ReceiptsController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<RevenueHub, IRevenueClient> _revenueHub;
 
-        public ReceiptsController(ProftaakContext context)
+        public ReceiptsController(ProftaakContext context, IHubContext<RevenueHub, IRevenueClient> revenueHub)
         {
             _context = context;
+            _revenueHub = revenueHub;
         }
 
         // GET: api/Receipts
@@ -57,6 +64,8 @@ namespace Proftaak_S3_API.Controllers
             {
                 totalRevenue += receipt.Price;
             }
+
+            await _revenueHub.Clients.All.ReceiveRevenue(totalRevenue);
 
             return totalRevenue;
         }
