@@ -136,6 +136,7 @@ namespace Proftaak_S3_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
+            #region PostReservations
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
             var garage = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
@@ -155,7 +156,156 @@ namespace Proftaak_S3_API.Controllers
             }
 
             _context.Reservations.Add(reservations);
-            await _context.SaveChangesAsync();            
+            await _context.SaveChangesAsync();
+            #endregion
+
+            #region PostReceipt
+
+            List<Pricing> pricing = new List<Pricing>();
+            try
+            {
+                List<Pricing> p;
+                p = _context.Pricing.ToList();
+                foreach (var price in p)
+                {
+                    if (price.StartingTime.Value.TimeOfDay < reservations.ArrivalTime.TimeOfDay || price.EndingTime.Value.TimeOfDay < reservations.DepartureTime.Value.TimeOfDay && price.StartingTime.Value.DayOfWeek == reservations.ArrivalTime.DayOfWeek)
+                    {
+                        pricing.Add(price);
+                    }
+                    
+                }
+            }
+            catch (Exception)
+            {
+                pricing = null;
+            }
+
+            if (pricing != null && pricing.Count() != 0)
+            {
+                decimal TotalPrice = 0;
+                decimal normalPrice = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
+                TimeSpan hours;
+                TimeSpan hoursToRemove = new TimeSpan();
+
+                foreach (var price in pricing)
+                {
+                    if (price.StartingTime.Value.TimeOfDay > reservations.ArrivalTime.TimeOfDay)
+                    {
+                        if (price.EndingTime.Value.TimeOfDay > reservations.DepartureTime.Value.TimeOfDay)
+                        {
+                            hours = reservations.DepartureTime.Value.TimeOfDay - price.StartingTime.Value.TimeOfDay;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                        else
+                        {
+                            hours = price.EndingTime.Value.TimeOfDay - price.StartingTime.Value.TimeOfDay;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                    }
+                    else
+                    {
+                        if (price.EndingTime.Value.TimeOfDay > reservations.DepartureTime.Value.TimeOfDay)
+                        {
+                            hours = reservations.DepartureTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                        else
+                        {
+                            hours = price.EndingTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
+                            hoursToRemove += hours;
+                            decimal priceToAdd = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                            TotalPrice += priceToAdd;
+                        }
+                    }
+
+                    List<Pricing> pricingOverlap = pricing.Where(p => p.StartingTime.Value.TimeOfDay < price.StartingTime.Value.TimeOfDay || p.EndingTime.Value.TimeOfDay < price.EndingTime.Value.TimeOfDay).ToList();
+
+                    foreach (var pOverlap in pricingOverlap)
+                    {
+                        if (pOverlap.recurring != true)
+                        {
+                            foreach (var p in pricingOverlap)
+                            {
+                                if (p.StartingTime.Value.TimeOfDay <= pOverlap.StartingTime.Value.TimeOfDay && p.EndingTime.Value.TimeOfDay <= pOverlap.EndingTime.Value.TimeOfDay)
+                                {
+                                    if (pOverlap.StartingTime.Value.TimeOfDay >= p.StartingTime.Value.TimeOfDay)
+                                    {
+                                        if (pOverlap.EndingTime.Value.TimeOfDay >= p.EndingTime.Value.TimeOfDay)
+                                        {
+                                            hours = p.EndingTime.Value.TimeOfDay - pOverlap.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                        else
+                                        {
+                                            hours = pOverlap.EndingTime.Value.TimeOfDay - pOverlap.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (pOverlap.EndingTime.Value.TimeOfDay >= p.EndingTime.Value.TimeOfDay)
+                                        {
+                                            hours = p.EndingTime.Value.TimeOfDay - p.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                        else
+                                        {
+                                            hours = pOverlap.EndingTime.Value.TimeOfDay - p.StartingTime.Value.TimeOfDay;
+                                            hoursToRemove += hours;
+                                            decimal priceToRemove = price.Price * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                                            TotalPrice -= priceToRemove;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                hours = reservations.DepartureTime.Value.TimeOfDay - reservations.ArrivalTime.TimeOfDay;
+                if (hours > hoursToRemove)
+                {
+                    hours -= hoursToRemove;
+                    decimal priceToAdd = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
+                    TotalPrice += priceToAdd;
+                }
+
+                TotalPrice = decimal.Parse(TotalPrice.ToString("0.00"));
+                Receipt receipt = new Receipt { ReservationID = reservations.Id, Price = TotalPrice };
+
+                _context.Receipt.Add(receipt);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                TimeSpan hours = reservations.DepartureTime.Value - reservations.ArrivalTime;
+
+                decimal normalPrice = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
+
+                decimal price = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
+
+                price = decimal.Parse(price.ToString("0.00"));
+
+                Receipt receipt = new Receipt { ReservationID = reservations.Id, Price = price };
+
+                _context.Receipt.Add(receipt);
+                await _context.SaveChangesAsync();
+            }
+            
+            #endregion
+
 
             return CreatedAtAction("GetReservations", new { id = reservations.Id }, reservations);
         }
