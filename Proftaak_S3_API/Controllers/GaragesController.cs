@@ -296,6 +296,7 @@ namespace Proftaak_S3_API.Controllers
             Space space = await _context.Space.FindAsync(reservation.SpaceID);
             space.StatusId = 1;
             _context.Entry(space).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
             await _spaceHub.Clients.All.ReceiveSpaces(spaces);
 
