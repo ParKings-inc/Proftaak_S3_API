@@ -18,19 +18,22 @@ namespace Proftaak_S3_API.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly ProftaakContext _context;
-        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
+        private readonly IHubContext<ReservationHub, IReservationClient> _reservationHub;
 
-        public ReservationsController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub)
+        public ReservationsController(ProftaakContext context, IHubContext<ReservationHub, IReservationClient> reservationHub)
         {
             _context = context;
-            _spaceHub = spaceHub;
+            _reservationHub = reservationHub;
         }
 
         // GET: api/Reservations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Reservations>>> GetReservations()
         {
-            return await _context.Reservations.ToListAsync();
+            var reservations = await _context.Reservations.ToListAsync();
+            await _reservationHub.Clients.All.ReceiveReservation(reservations);
+            await _reservationHub.Clients.All.ReceiveUpdatedStatus(reservations);
+            return reservations;
         }
 
         [HttpGet("User/{id}")]

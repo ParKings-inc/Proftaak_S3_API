@@ -5,6 +5,6 @@ namespace Proftaak_S3_API.Hubs.Clients
 {
     public interface ISpaceClient
     {
-        Task ReceiveAvailableSpaces(List<Space> space);
+        Task ReceiveSpaces(List<Space> space);
     }
 }

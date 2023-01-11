@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Proftaak_S3_API.Hubs;
+using Proftaak_S3_API.Hubs.Clients;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -9,10 +12,12 @@ namespace Proftaak_S3_API.Controllers
     public class GaragesController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
 
-        public GaragesController(ProftaakContext context)
+        public GaragesController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub)
         {
             _context = context;
+            _spaceHub = spaceHub;
         }
 
         // GET: api/Garages
@@ -121,6 +126,9 @@ namespace Proftaak_S3_API.Controllers
             if (reservation == null) {
                 return await TryCreateNewReservation(garageId, car);
             }
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
+
             return await TryEnterWithExistingReservation(garageId, reservation, car);
         }
 
@@ -134,6 +142,10 @@ namespace Proftaak_S3_API.Controllers
             reservation.DepartureTime = DateTime.Now;
             reservation.Status = "Awaiting payment";
             await _context.SaveChangesAsync();
+
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
+
             return true;
         }
 
