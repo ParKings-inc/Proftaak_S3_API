@@ -139,6 +139,7 @@ namespace Proftaak_S3_API.Controllers
         [HttpPost]
         public async Task<ActionResult<Reservations>> PostReservations(Reservations reservations)
         {
+            #region PostReservations
             var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
             var garage = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
@@ -158,7 +159,11 @@ namespace Proftaak_S3_API.Controllers
             }
 
             _context.Reservations.Add(reservations);
-            await _context.SaveChangesAsync();            
+            await _context.SaveChangesAsync();
+            #endregion
+
+          
+
 
             return CreatedAtAction("GetReservations", new { id = reservations.Id }, reservations);
         }
