@@ -44,5 +44,6 @@ app.MapControllers();
 
 app.MapHub<SpaceHub>("/hubs/spaces");
 app.MapHub<RevenueHub>("/hubs/revenue");
+app.MapHub<ReservationHub>("/hubs/reservation");
 
 app.Run();

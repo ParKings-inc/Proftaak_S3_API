@@ -31,7 +31,7 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<IEnumerable<Space>>> GetSpacesForGarage(int id)
         {
             var spaces = await _context.Space.Where(s=>s.GarageID == id).ToListAsync();
-            await _spaceHub.Clients.All.ReceiveAvailableSpaces(spaces);
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
             return spaces;
         }
 

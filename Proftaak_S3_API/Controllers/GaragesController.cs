@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Proftaak_S3_API.Hubs;
+using Proftaak_S3_API.Hubs.Clients;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -9,10 +12,14 @@ namespace Proftaak_S3_API.Controllers
     public class GaragesController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
+        private readonly IHubContext<ReservationHub, IReservationClient> _reservationHub;
 
-        public GaragesController(ProftaakContext context)
+        public GaragesController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub, IHubContext<ReservationHub, IReservationClient> reservationHub)
         {
             _context = context;
+            _spaceHub = spaceHub;
+            _reservationHub = reservationHub;   
         }
 
         // GET: api/Garages
@@ -121,6 +128,7 @@ namespace Proftaak_S3_API.Controllers
             if (reservation == null) {
                 return await TryCreateNewReservation(garageId, car);
             }
+          
             return await TryEnterWithExistingReservation(garageId, reservation, car);
         }
 
@@ -259,6 +267,10 @@ namespace Proftaak_S3_API.Controllers
                 }
 
                 TotalPrice = decimal.Parse(TotalPrice.ToString("0.00"));
+                if(TotalPrice == 0)
+                {
+                    TotalPrice= 0.01M;
+                }
                 Receipt receipt = new Receipt { ReservationID = reservation.Id, Price = TotalPrice };
 
                 _context.Receipt.Add(receipt);
@@ -281,7 +293,14 @@ namespace Proftaak_S3_API.Controllers
             }
 
             #endregion
+            Space space = await _context.Space.FindAsync(reservation.SpaceID);
+            space.StatusId = 1;
+            _context.Entry(space).State = EntityState.Modified;
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
 
+            var reservations = await _context.Reservations.ToListAsync();
+            await _reservationHub.Clients.All.ReceiveReservation(reservations);
             return true;
         }
 
@@ -292,6 +311,9 @@ namespace Proftaak_S3_API.Controllers
             {
                 reservation.ArrivalTime = DateTime.Now;
                 _context.Entry(reservation).State = EntityState.Modified;
+                Space space = await _context.Space.FindAsync(reservation.SpaceID);
+                space.StatusId = 2;
+                _context.Entry(space).State = EntityState.Modified;
 
                 try
                 {
@@ -301,7 +323,11 @@ namespace Proftaak_S3_API.Controllers
                 {
                 }
             }
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
 
+            var reservations = await _context.Reservations.ToListAsync();
+            await _reservationHub.Clients.All.ReceiveReservation(reservations);
             return true;
         }
 
@@ -315,6 +341,11 @@ namespace Proftaak_S3_API.Controllers
                 return false;
             }
             await CreateReservation(garage, car, arrival);
+            var spaces = await _context.Space.Where(i => i.GarageID == garageId).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveSpaces(spaces);
+
+            var reservations = await _context.Reservations.ToListAsync();
+            await _reservationHub.Clients.All.ReceiveReservation(reservations);
             return true;
         }
 
@@ -332,6 +363,9 @@ namespace Proftaak_S3_API.Controllers
                 DepartureTime = null
             };
             _context.Reservations!.Add(reservation);
+           Space space = await _context.Space.FindAsync(spaceId);
+            space.StatusId = 2;
+             _context.Entry(space).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return true;
         }
