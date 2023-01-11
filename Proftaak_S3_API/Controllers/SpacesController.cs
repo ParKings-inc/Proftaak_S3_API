@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
+using Microsoft.AspNetCore.SignalR;
+using Proftaak_S3_API.Hubs;
+using Proftaak_S3_API.Hubs.Clients;
 
 namespace Proftaak_S3_API.Controllers
 {
@@ -16,14 +19,24 @@ namespace Proftaak_S3_API.Controllers
     public class SpacesController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
 
-        public SpacesController(ProftaakContext context)
+        public SpacesController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub)
         {
             _context = context;
+            _spaceHub = spaceHub;
+        }
+
+        [HttpGet("garage/{id}")]
+        public async Task<ActionResult<IEnumerable<Space>>> GetSpacesForGarage(int id)
+        {
+            var spaces = await _context.Space.Where(s=>s.GarageID == id).ToListAsync();
+            await _spaceHub.Clients.All.ReceiveAvailableSpaces(spaces);
+            return spaces;
         }
 
 
-        [HttpGet("FreeSpaces/{id}")]
+            [HttpGet("FreeSpaces/{id}")]
         public async Task<string> GetFreeSpaces(int id)
         {
             Garage garage = _context.Garage.Where(g => g.Id == id).FirstOrDefault();
@@ -79,6 +92,12 @@ namespace Proftaak_S3_API.Controllers
         public async Task<ActionResult<IEnumerable<Space>>> GetSpace()
         {
             return await _context.Space.ToListAsync();
+        }
+
+        [HttpGet("status")]
+        public async Task<ActionResult<IEnumerable<SpaceStatus>>> GetSpaceStatus()
+        {
+            return await _context.SpaceStatus.ToListAsync();
         }
 
         // GET: api/Spaces/5

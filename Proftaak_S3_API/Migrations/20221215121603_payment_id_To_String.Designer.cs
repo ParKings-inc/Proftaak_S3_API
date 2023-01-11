@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20221215121603_payment_id_To_String")]
+    partial class payment_id_To_String
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Car", (string)null);
+                    b.ToTable("Car");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Garage", b =>
@@ -74,7 +76,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Garage", (string)null);
+                    b.ToTable("Garage");
 
                     b.HasData(
                         new
@@ -113,7 +115,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Pricing", (string)null);
+                    b.ToTable("Pricing");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Receipt", b =>
@@ -133,7 +135,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Receipt", (string)null);
+                    b.ToTable("Receipt");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Reservations", b =>
@@ -161,11 +163,12 @@ namespace Proftaak_S3_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("payment_id")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reservations", (string)null);
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Role", b =>
@@ -182,7 +185,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new
@@ -217,15 +220,12 @@ namespace Proftaak_S3_API.Migrations
                     b.Property<int>("Spot")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StatusId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.ToTable("Space", (string)null);
+                    b.ToTable("Space");
 
                     b.HasData(
                         new
@@ -275,40 +275,6 @@ namespace Proftaak_S3_API.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Proftaak_S3_API.Models.SpaceStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SpaceStatus", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Available"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Occupied"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Unavailable"
-                        });
-                });
-
             modelBuilder.Entity("Proftaak_S3_API.Models.SpaceType", b =>
                 {
                     b.Property<int>("Id")
@@ -323,7 +289,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceType", (string)null);
+                    b.ToTable("SpaceType");
 
                     b.HasData(
                         new
@@ -348,7 +314,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 #pragma warning restore 612, 618
         }

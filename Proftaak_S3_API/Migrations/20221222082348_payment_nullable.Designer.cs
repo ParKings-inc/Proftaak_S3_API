@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Proftaak_S3_API.Models;
 
@@ -11,9 +12,10 @@ using Proftaak_S3_API.Models;
 namespace Proftaak_S3_API.Migrations
 {
     [DbContext(typeof(ProftaakContext))]
-    partial class ProftaakContextModelSnapshot : ModelSnapshot
+    [Migration("20221222082348_payment_nullable")]
+    partial class payment_nullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Car", (string)null);
+                    b.ToTable("Car");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Garage", b =>
@@ -74,7 +76,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Garage", (string)null);
+                    b.ToTable("Garage");
 
                     b.HasData(
                         new
@@ -113,7 +115,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Pricing", (string)null);
+                    b.ToTable("Pricing");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Receipt", b =>
@@ -133,7 +135,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Receipt", (string)null);
+                    b.ToTable("Receipt");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Reservations", b =>
@@ -165,7 +167,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reservations", (string)null);
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("Proftaak_S3_API.Models.Role", b =>
@@ -182,7 +184,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new
@@ -225,7 +227,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Space", (string)null);
+                    b.ToTable("Space");
 
                     b.HasData(
                         new
@@ -289,7 +291,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceStatus", (string)null);
+                    b.ToTable("SpaceStatus");
 
                     b.HasData(
                         new
@@ -323,7 +325,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SpaceType", (string)null);
+                    b.ToTable("SpaceType");
 
                     b.HasData(
                         new
@@ -348,7 +350,7 @@ namespace Proftaak_S3_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 #pragma warning restore 612, 618
         }

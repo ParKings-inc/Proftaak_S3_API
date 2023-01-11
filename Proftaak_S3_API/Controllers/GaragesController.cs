@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Proftaak_S3_API.Models;
 
@@ -113,6 +108,84 @@ namespace Proftaak_S3_API.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpPost("EnterGarage/{garageId}/{licencePlate}")]
+        public async Task<bool> EnterGarage(int garageId, string licencePlate) {
+            Car? car = await _context.Car!.FirstOrDefaultAsync(i => i.Kenteken == licencePlate);
+            if (car == null) {
+                return false;
+            }
+
+            Reservations? reservation = await _context.GetReservation(licencePlate, garageId, true);
+            if (reservation == null) {
+                return await TryCreateNewReservation(garageId, car);
+            }
+            return await TryEnterWithExistingReservation(garageId, reservation, car);
+        }
+
+        [HttpPut("LeaveGarage/{garageId}/{licencePlate}")]
+        public async Task<bool> LeaveGarage(int garageId, string licencePlate) {
+            Reservations? reservation = await _context.GetReservation(licencePlate, garageId, false);
+            if (reservation == null) {
+                return false;
+            }
+
+            reservation.DepartureTime = DateTime.Now;
+            reservation.Status = "Awaiting payment";
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        private async Task<bool> TryEnterWithExistingReservation(int garageId, Reservations reservation, Car car) {
+            if (reservation.Status != "Accepted") {
+                return await TryCreateNewReservation(garageId, car);
+            } else
+            {
+                reservation.ArrivalTime = DateTime.Now;
+                _context.Entry(reservation).State = EntityState.Modified;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch 
+                {
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> TryCreateNewReservation(int garageId, Car car) {
+            Garage? garage = await _context.Garage!.FirstOrDefaultAsync(i => i.Id == garageId);
+            if (garage == null) {
+                return false;
+            }
+            DateTime arrival = DateTime.Now;
+            if (garage.GetAvailableSpaceCount(_context, arrival, null) <= 0) {
+                return false;
+            }
+            await CreateReservation(garage, car, arrival);
+            return true;
+        }
+
+        private async Task<bool> CreateReservation(Garage garage, Car car, DateTime arrival) {
+            int spaceId = await garage.GetNextAvailableSpaceId(_context, arrival, null);
+            if (spaceId == -1) {
+                return false;
+            }
+
+            Reservations reservation = new Reservations() {
+                SpaceID = spaceId,
+                CarID = car.Id,
+                Status = "Accepted",
+                ArrivalTime = DateTime.Now,
+                DepartureTime = null
+            };
+            _context.Reservations!.Add(reservation);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         private bool GarageExists(int id)

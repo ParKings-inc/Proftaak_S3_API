@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Proftaak_S3_API.Hubs.Clients;
+using Proftaak_S3_API.Hubs;
 using Proftaak_S3_API.Models;
 
 namespace Proftaak_S3_API.Controllers
@@ -15,10 +18,12 @@ namespace Proftaak_S3_API.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<SpaceHub, ISpaceClient> _spaceHub;
 
-        public ReservationsController(ProftaakContext context)
+        public ReservationsController(ProftaakContext context, IHubContext<SpaceHub, ISpaceClient> spaceHub)
         {
             _context = context;
+            _spaceHub = spaceHub;
         }
 
         // GET: api/Reservations
@@ -31,9 +36,9 @@ namespace Proftaak_S3_API.Controllers
         [HttpGet("User/{id}")]
         public async Task<string> GetReservationsByUser(string id)
         {
-            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id, SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID, Kenteken = c.Kenteken, Status = r.Status })
-                .Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { ReservationID = r.Id, SpaceID = r.SpaceID, Kenteken = r.Kenteken, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = r.UserID, Status = r.Status, SpaceNumber = s.Spot, SpaceRow = s.Row, SpaceFloor = s.Floor, GarageID = s.GarageID }).Where(r => r.UserID == id)
-                .Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { GarageName = g.Name, ReservationID = s.ReservationID, SpaceID = s.SpaceID, Kenteken = s.Kenteken, CarID = s.CarID, ArrivalTime = s.ArrivalTime, DepartureTime = s.DepartureTime, UserID = s.UserID, Status = s.Status, SpaceNumber = s.SpaceNumber, SpaceRow = s.SpaceRow, SpaceFloor = s.SpaceFloor, GarageID = s.GarageID })
+            var reservations = await _context.Reservations.Join(_context.Car, r => r.CarID, c => c.Id, (r, c) => new { r.Id, SpaceID = r.SpaceID, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = c.UserID, Kenteken = c.Kenteken, Status = r.Status, PaymentID = r.payment_id })
+                .Join(_context.Space, r => r.SpaceID, s => s.ID, (r, s) => new { ReservationID = r.Id, SpaceID = r.SpaceID, Kenteken = r.Kenteken, CarID = r.CarID, ArrivalTime = r.ArrivalTime, DepartureTime = r.DepartureTime, UserID = r.UserID, Status = r.Status, SpaceNumber = s.Spot, SpaceRow = s.Row, SpaceFloor = s.Floor, GarageID = s.GarageID, PaymentID = r.PaymentID }).Where(r => r.UserID == id)
+                .Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { GarageName = g.Name, ReservationID = s.ReservationID, SpaceID = s.SpaceID, Kenteken = s.Kenteken, CarID = s.CarID, ArrivalTime = s.ArrivalTime, DepartureTime = s.DepartureTime, UserID = s.UserID, Status = s.Status, SpaceNumber = s.SpaceNumber, SpaceRow = s.SpaceRow, SpaceFloor = s.SpaceFloor, GarageID = s.GarageID, PaymentID = s.PaymentID })
                 .ToListAsync();
             if (reservations == null || reservations.Count() == 0)
             {
@@ -79,7 +84,7 @@ namespace Proftaak_S3_API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReservations(int id, Reservations reservations)
         {
-            var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).ToList();
+            var ReservationsByCar = _context.Reservations.Where(r => r.CarID == reservations.CarID).AsNoTracking().ToList();
             var garage = _context.Space.Where(s => s.ID == reservations.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.OpeningTime, g.ClosingTime }).Where(s => s.GarageID == s.Id).First();
             var ArrivalTime = reservations.ArrivalTime.AddMinutes(-15);
             var DepartureTime = reservations.DepartureTime?.AddMinutes(15);
@@ -93,7 +98,7 @@ namespace Proftaak_S3_API.Controllers
             {
                 if (res.ArrivalTime <= ArrivalTime && res.ArrivalTime <= DepartureTime && res.DepartureTime >= ArrivalTime || res.ArrivalTime >= ArrivalTime && res.ArrivalTime <= DepartureTime)
                 {
-                    if (res.Id != reservations.Id)
+                    if (res.Id != reservations.Id && reservations.Status !="Awaiting payment" && reservations.Status != "Paid")
                     {
                         return BadRequest("You already have a reservation for this license plate");
                     }
@@ -300,6 +305,7 @@ namespace Proftaak_S3_API.Controllers
             }
             
             #endregion
+
 
             return CreatedAtAction("GetReservations", new { id = reservations.Id }, reservations);
         }

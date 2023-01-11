@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Proftaak_S3_API.Models;
+using Microsoft.AspNetCore.SignalR;
+using Proftaak_S3_API.Hubs;
+using Proftaak_S3_API.Hubs.Clients;
 
 namespace Proftaak_S3_API.Controllers
 {
@@ -15,10 +19,12 @@ namespace Proftaak_S3_API.Controllers
     public class ReceiptsController : ControllerBase
     {
         private readonly ProftaakContext _context;
+        private readonly IHubContext<RevenueHub, IRevenueClient> _revenueHub;
 
-        public ReceiptsController(ProftaakContext context)
+        public ReceiptsController(ProftaakContext context, IHubContext<RevenueHub, IRevenueClient> revenueHub)
         {
             _context = context;
+            _revenueHub = revenueHub;
         }
         // GET: api/Receipts
         [HttpGet]
@@ -51,6 +57,28 @@ namespace Proftaak_S3_API.Controllers
             }
 
             return JsonConvert.SerializeObject(receipts);
+        }
+
+        // GET: api/Receipts/byday/5
+        [HttpGet("byday/{currentDay}")]
+        public async Task<ActionResult<decimal>> GetReceiptsByDay(DateTime currentDay)
+        {
+            var currentDayReservations = _context.Reservations.Where(g => g.DepartureTime.Value.Date == currentDay).ToListAsync();
+            var idListReservations = new List<int>();
+            foreach (var reservation in currentDayReservations.Result)
+            {
+                idListReservations.Add(reservation.Id);
+            }
+            var receiptsByReservationId = await _context.Receipt.Where(r => idListReservations.Contains(r.ReservationID)).ToListAsync();
+            decimal totalRevenue = 0;
+            foreach (var receipt in receiptsByReservationId)
+            {
+                totalRevenue += receipt.Price;
+            }
+
+            await _revenueHub.Clients.All.ReceiveRevenue(totalRevenue);
+
+            return totalRevenue;
         }
 
         // PUT: api/Receipts/5
