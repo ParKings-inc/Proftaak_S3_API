@@ -267,7 +267,7 @@ namespace Proftaak_S3_API.Controllers
                 }
 
                 TotalPrice = decimal.Parse(TotalPrice.ToString("0.00"));
-                if(TotalPrice == 0)
+                if(TotalPrice <=0.01M)
                 {
                     TotalPrice= 0.01M;
                 }
@@ -283,6 +283,11 @@ namespace Proftaak_S3_API.Controllers
                 decimal normalPrice = _context.Space.Where(s => s.ID == reservation.SpaceID).Join(_context.Garage, s => s.GarageID, g => g.Id, (s, g) => new { g.Id, s.GarageID, g.NormalPrice }).Where(s => s.GarageID == s.Id).First().NormalPrice;
 
                 decimal price = normalPrice * (decimal)(hours.Hours + hours.Minutes / 60.0);
+
+                if (price <= 0.01M)
+                {
+                    price = 0.01M;
+                }
 
                 price = decimal.Parse(price.ToString("0.00"));
 
