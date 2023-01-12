@@ -181,6 +181,10 @@ namespace Proftaak_S3_API.Controllers
             _context.Reservations.Remove(reservations);
             await _context.SaveChangesAsync();
 
+            var reserveReturn = await _context.Reservations.ToListAsync();
+
+            await _reservationHub.Clients.All.ReceiveReservation(reserveReturn);
+
             return NoContent();
         }
 
